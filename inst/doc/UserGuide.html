@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+<meta name="date" content="2023-01-09" />
+
+<title>MRMCaov for R User Guide</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">MRMCaov for R User Guide</h1>
+<h3 class="subtitle">Package Version 0.3.0</h3>
+<h4 class="author">Brian J Smith</h4>
+<address class="author_afil">
+Department of Biostatistics, University of Iowa<br><a class="author_email" href="mailto:#"><a href="mailto:brian-j-smith@uiowa.edu" class="email">brian-j-smith@uiowa.edu</a></a>
+</address>
+<h4 class="author">Stephen L Hillis</h4>
+<address class="author_afil">
+Departments of Radiology and Biostatistics, University of Iowa<br><a class="author_email" href="mailto:#"><a href="mailto:steve-hillis@uiowa.edu" class="email">steve-hillis@uiowa.edu</a></a>
+</address>
+<h4 class="date">2023-01-09</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#getting-started"><span class="toc-section-number">1</span> Getting Started</a><ul>
+<li><a href="#documentation-user-guide"><span class="toc-section-number">1.1</span> Documentation: <span>User Guide</span></a></li>
+<li><a href="#installation"><span class="toc-section-number">1.2</span> Installation</a></li>
+<li><a href="#citing-the-software"><span class="toc-section-number">1.3</span> Citing the Software</a></li>
+</ul></li>
+<li><a href="#introduction"><span class="toc-section-number">2</span> Introduction</a></li>
+<li><a href="#obuchowski-and-rockette-model"><span class="toc-section-number">3</span> Obuchowski and Rockette Model</a></li>
+<li><a href="#vandyke-example"><span class="toc-section-number">4</span> VanDyke Example</a></li>
+<li><a href="#multi-reader-multi-case-analysis"><span class="toc-section-number">5</span> Multi-Reader Multi-Case Analysis</a><ul>
+<li><a href="#performance-metrics"><span class="toc-section-number">5.1</span> Performance Metrics</a><ul>
+<li><a href="#area-under-the-roc-curve"><span class="toc-section-number">5.1.1</span> Area Under the ROC Curve</a></li>
+<li><a href="#roc-curve-expected-utility"><span class="toc-section-number">5.1.2</span> ROC Curve Expected Utility</a></li>
+<li><a href="#roc-curve-sensitivity-and-specificity"><span class="toc-section-number">5.1.3</span> ROC Curve Sensitivity and Specificity</a></li>
+<li><a href="#binary-metrics"><span class="toc-section-number">5.1.4</span> Binary Metrics</a></li>
+</ul></li>
+<li><a href="#covariance-estimation-methods"><span class="toc-section-number">5.2</span> Covariance Estimation Methods</a></li>
+<li><a href="#fixed-factors"><span class="toc-section-number">5.3</span> Fixed Factors</a></li>
+<li><a href="#study-designs"><span class="toc-section-number">5.4</span> Study Designs</a></li>
+</ul></li>
+<li><a href="#single-reader-multi-case-analysis"><span class="toc-section-number">6</span> Single-Reader Multi-Case Analysis</a></li>
+<li><a href="#single-test-multi-case-analysis"><span class="toc-section-number">7</span> Single-Test Multi-Case Analysis</a></li>
+<li><a href="#roc-curves"><span class="toc-section-number">8</span> ROC Curves</a><ul>
+<li><a href="#curve-fitting"><span class="toc-section-number">8.1</span> Curve Fitting</a><ul>
+<li><a href="#single-curve"><span class="toc-section-number">8.1.1</span> Single Curve</a></li>
+<li><a href="#multiple-curves"><span class="toc-section-number">8.1.2</span> Multiple Curves</a></li>
+<li><a href="#parametric-curves"><span class="toc-section-number">8.1.3</span> Parametric Curves</a></li>
+</ul></li>
+<li><a href="#curve-points"><span class="toc-section-number">8.2</span> Curve Points</a></li>
+<li><a href="#mean-curves"><span class="toc-section-number">8.3</span> Mean Curves</a></li>
+</ul></li>
+<li><a href="#reader-performance-metrics"><span class="toc-section-number">9</span> Reader Performance Metrics</a><ul>
+<li><a href="#roc-curve-metrics"><span class="toc-section-number">9.1</span> ROC Curve Metrics</a></li>
+<li><a href="#binary-metrics-1"><span class="toc-section-number">9.2</span> Binary Metrics</a></li>
+</ul></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+
+<div id="getting-started" class="section level1">
+<h1><span class="header-section-number">1</span> Getting Started</h1>
+<p><strong>MRMCaov</strong> is an R package for statistical comparison of diagnostic tests - such as those based on medical imaging - for which ratings have been obtained from multiple readers and on multiple cases. Features of the package include the following.</p>
+<ul>
+<li>Statistical comparisons of diagnostic tests with respect to reader performance metrics</li>
+<li>Comparisons based on the ANOVA model of Obuchowski-Rockette and the unified framework of Hillis</li>
+<li>Reader performance metrics for area under receiver operating characteristic curves (ROC AUCs), partial AUCs, expected utility of ROC curves, likelihood ratio of positive or negative tests, sensitivity, specificity, and user-defined metrics</li>
+<li>Parametric and nonparametric estimation and plotting of ROC curves</li>
+<li>Support for factorial, nested, and partially paired study designs</li>
+<li>Inference for random or fixed readers and cases</li>
+<li>Conversion of Obuchowski-Rockette to Roe, Metz &amp; Hillis model parameters and vice versa</li>
+<li>DeLong, jackknife, and unbiased covariance estimation</li>
+<li>Compatibility with Microsoft Windows, MacOS, and Linux</li>
+</ul>
+<div id="documentation-user-guide" class="section level2">
+<h2><span class="header-section-number">1.1</span> Documentation: <a href="https://brian-j-smith.github.io/MRMCaov/using.html">User Guide</a></h2>
+</div>
+<div id="installation" class="section level2">
+<h2><span class="header-section-number">1.2</span> Installation</h2>
+<p>Enter the following at the R console to install the package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;MRMCaov&quot;</span>)</span></code></pre></div>
+</div>
+<div id="citing-the-software" class="section level2">
+<h2><span class="header-section-number">1.3</span> Citing the Software</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">## Text format</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">citation</span>(<span class="st">&quot;MRMCaov&quot;</span>)</span></code></pre></div>
+<pre><code>
+To cite MRMCaov in publications, please use the following two
+references, including the R package URL.
+
+  Smith BJ, Hillis SL, Pesce LL (2023). _MCMCaov: Multi-Reader
+  Multi-Case Analysis of Variance_. R package version 0.3.0,
+  &lt;https://github.com/brian-j-smith/MRMCaov&gt;.
+
+  Smith BJ, Hillis SL (2020). &quot;Multi-reader multi-case analysis of
+  variance software for diagnostic performance comparison of imaging
+  modalities.&quot; In Samuelson F, Taylor-Phillips S (eds.), _Proceedings
+  of SPIE 11316, Medical Imaging 2020: Image Perception, Observer
+  Performance, and Technology Assessment_, 113160K.
+  doi:10.1117/12.2549075 &lt;https://doi.org/10.1117/12.2549075&gt;,
+  &lt;https://pubmed.ncbi.nlm.nih.gov/32351258&gt;.
+
+To see these entries in BibTeX format, use &#39;print(&lt;citation&gt;,
+bibtex=TRUE)&#39;, &#39;toBibtex(.)&#39;, or set
+&#39;options(citation.bibtex.max=999)&#39;.</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">## Bibtex format</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">toBibtex</span>(<span class="kw">citation</span>(<span class="st">&quot;MRMCaov&quot;</span>))</span></code></pre></div>
+<pre><code>@Manual{MRMCaov-package,
+  author = {Brian J Smith and Stephen L Hillis and Lorenzo L Pesce},
+  title = {{MCMCaov}: Multi-Reader Multi-Case Analysis of Variance},
+  year = {2023},
+  note = {R package version 0.3.0},
+  url = {https://github.com/brian-j-smith/MRMCaov},
+}
+
+@InProceedings{MRMCaov-SPIE2020,
+  author = {Brian J. Smith and Stephen L. Hillis},
+  title = {Multi-reader multi-case analysis of variance software for diagnostic performance comparison of imaging modalities},
+  booktitle = {Proceedings of SPIE 11316, Medical Imaging 2020: Image Perception, Observer Performance, and Technology Assessment},
+  editor = {Frank Samuelson and Sian Taylor-Phillips},
+  month = {16 March},
+  year = {2020},
+  pages = {113160K},
+  doi = {10.1117/12.2549075},
+  url = {https://pubmed.ncbi.nlm.nih.gov/32351258},
+}</code></pre>
+</div>
+</div>
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">2</span> Introduction</h1>
+<p>A common study design for comparing the diagnostic performance of imaging modalities, or diagnostic tests, is to obtain modality-specific ratings from multiple readers of multiple cases (MRMC) whose true statuses are known. In such a design, receiver operating characteristic (ROC) indices, such as area under the ROC curve (ROC AUC), can be used to quantify correspondence between reader ratings and case status. Indices can then be compared statistically to determine if there are differences between modalities. However, special statistical methods are needed when readers or cases represent a random sample from a larger population of interest and there is overlap between modalities, readers, and/or cases. An ANOVA model designed for these characteristics of MRMC studies was initially proposed by Dorfman et al. <span class="citation">(Dorfman, Berbaum, and Metz 1992)</span> and Obuchowski and Rockette <span class="citation">(Obuchowski and Rockette 1995)</span> and later unified and improved by Hillis and colleagues <span class="citation">(Hillis et al. 2005; Hillis 2007, 2018; Hillis, Berbaum, and Metz 2008)</span>. Their models are implemented in the <strong>MRMCaov</strong> R package <span class="citation">(Smith, Hillis, and Pesce 2022)</span>.</p>
+</div>
+<div id="obuchowski-and-rockette-model" class="section level1">
+<h1><span class="header-section-number">3</span> Obuchowski and Rockette Model</h1>
+<p><strong>MRMCaov</strong> implements multi-reader multi-case analysis based on the Obuchowski and Rockette <span class="citation">(1995)</span> analysis of variance (ANOVA) model <span class="math display">\[
+\hat{\theta}_{ij} = \mu + \tau_i + R_j + (\tau R)_{ij} + \epsilon_{ij},
+\]</span> where <span class="math inline">\(i = 1,\ldots,t\)</span> and <span class="math inline">\(j = 1,\ldots,r\)</span> index diagnostic tests and readers; <span class="math inline">\(\hat{\theta}_{ij}\)</span> is a reader performance metric, such as ROC AUC, estimated over multiple cases; <span class="math inline">\(\mu\)</span> an overall study mean; <span class="math inline">\(\tau_i\)</span> a fixed test effect; <span class="math inline">\(R_j\)</span> a random reader effect; <span class="math inline">\((\tau R)_{ij}\)</span> a random test <span class="math inline">\(\times\)</span> reader interaction effect; and <span class="math inline">\(\epsilon_{ij}\)</span> a random error term. The random terms <span class="math inline">\(R_j\)</span>, <span class="math inline">\((\tau R)_{ij}\)</span>, and <span class="math inline">\(\epsilon_{ij}\)</span> are assumed to be mutually independent and normally distributed with 0 means and variances <span class="math inline">\(\sigma^2_R\)</span>, <span class="math inline">\(\sigma^2_{TR}\)</span>, and <span class="math inline">\(\sigma^2_\epsilon\)</span>.</p>
+<p>The error covariances between tests and between readers are further assumed to be equal, resulting in the three covariances <span class="math display">\[
+\text{Cov}(\epsilon_{ij}, \epsilon_{i&#39;j&#39;}) = \left\{
+  \begin{array}{lll}
+    \text{Cov}_1 &amp; i \ne i&#39;, j = j&#39; &amp; \text{(different test, same reader)} \\
+    \text{Cov}_2 &amp; i = i&#39;, j \ne j&#39; &amp; \text{(same test, same reader)} \\
+    \text{Cov}_3 &amp; i \ne i&#39;, j \ne j&#39; &amp; \text{(different test, different reader)}.
+  \end{array}
+\right.
+\]</span> Obuchowski and Rockette <span class="citation">(1995)</span> suggest a covariance ordering of <span class="math inline">\(\text{Cov}_1 \ge \text{Cov}_2 \ge \text{Cov}_3 \ge 0\)</span> based on clinical considerations. Hillis <span class="citation">(2014)</span> later showed that these can be replaced with the less restrictive orderings <span class="math inline">\(\text{Cov}_1 \ge \text{Cov}_3\)</span>, <span class="math inline">\(\text{Cov}_2 \ge \text{Cov}_3\)</span>, and <span class="math inline">\(\text{Cov}_3 \ge 0\)</span>. Alternatively, the covariance can be specified as the population correlations <span class="math inline">\(\rho_i = \text{Cov}_i / \sigma^2_\epsilon\)</span>.</p>
+<p>In the Obuchowski-Rockette ANOVA model, <span class="math inline">\(\sigma^2_\epsilon\)</span> can be interpreted as the performance metric variance for a single fixed reader and test; and <span class="math inline">\(\text{Cov}_1\)</span>, <span class="math inline">\(\text{Cov}_2\)</span>, and <span class="math inline">\(\text{Cov}_3\)</span> as the performance metric covariances for the same reader of two different tests, two different readers of the same test, and two different readers of two different tests. These error variance and covariance parameters are estimated in the package by averaging the reader and test-specific estimates computed using jackknifing <span class="citation">(Efron 1982)</span> or, for empirical ROC AUC, an unbiased estimator <span class="citation">(Gallas, Pennello, and Meyers 2007)</span> or the method of DeLong <span class="citation">(DeLong, DeLong, and Clarke-Pearson 1988)</span>.</p>
+</div>
+<div id="vandyke-example" class="section level1">
+<h1><span class="header-section-number">4</span> VanDyke Example</h1>
+<p>Use of the <strong>MRMCaov</strong> package is illustrated with data from a study comparing the relative performance of cinematic presentation of MRI (CINE MRI) to single spin-echo magnetic resonance imaging (SE MRI) for the detection of thoracic aortic dissection <span class="citation">(VanDyke et al. 1993)</span>. In the study, 45 patients with aortic dissection and 69 without dissection were imaged with both modalities. Based on the images, five radiologists rated patients disease statuses as 1 = definitely no aortic dissection, 2 = probably no aortic dissection, 3 = unsure about aortic dissection, 4 = probably aortic dissection, or 5 = definitely aortic dissection. Interest lies in estimating ROC curves for each combination of reader and modality and in comparing modalities with respect to summary statistics from the curves. The study data are included in the package as a data frame named <code>VanDyke</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">## Load MRMCaov library and VanDyke dataset</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="kw">library</span>(MRMCaov)</span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="kw">data</span>(VanDyke, <span class="dt">package =</span> <span class="st">&quot;MRMCaov&quot;</span>)</span></code></pre></div>
+<pre><code>##    reader treatment case truth rating case2 case3
+## 1       1         1    1     0      1   1.1   1.1
+## 2       1         2    1     0      3   1.1   2.1
+## 3       2         1    1     0      2   2.1   1.1
+## 4       2         2    1     0      3   2.1   2.1
+## 5       3         1    1     0      2   3.1   1.1
+## 6       3         2    1     0      2   3.1   2.1
+## 7       4         1    1     0      1   4.1   1.1
+## 8       4         2    1     0      2   4.1   2.1
+## 9       5         1    1     0      3   5.1   1.1
+## 10      5         2    1     0      2   5.1   2.1
+## 11      1         1    2     0      2   1.2   1.2
+## 12      1         2    2     0      3   1.2   2.2
+## 13      2         1    2     0      3   2.2   1.2
+## 14      2         2    2     0      2   2.2   2.2
+## 15      3         1    2     0      2   3.2   1.2
+## 16      3         2    2     0      4   3.2   2.2
+## 17      4         1    2     0      1   4.2   1.2
+## 18      4         2    2     0      2   4.2   2.2
+## 19      5         1    2     0      5   5.2   1.2
+## 20      5         2    2     0      2   5.2   2.2
+## ... with 1120 more rows</code></pre>
+<p>The study employed a factorial design in which each of the five radiologists read and rated both the CINE and SE MRI images from all 114 cases. The original study variables in the <code>VanDyke</code> data frame are summarized below along with two additional <code>case2</code> and <code>case3</code> variables that represent hypothetical study designs in which cases are nested within readers (<code>reader</code>) and within imaging modalities (<code>treatment</code>), respectively.</p>
+<table>
+<colgroup>
+<col width="14%"></col>
+<col width="85%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>reader</code></td>
+<td align="left">unique identifiers for the five radiologists</td>
+</tr>
+<tr class="even">
+<td align="left"><code>treatment</code></td>
+<td align="left">identifiers for the imaging modality (1 = CINE MRI, 2 = SE MRI)</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>case</code></td>
+<td align="left">identifiers for the 114 cases</td>
+</tr>
+<tr class="even">
+<td align="left"><code>truth</code></td>
+<td align="left">indicator for thoracic aortic dissection (1 = performed, 0 = not performed)</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>rating</code></td>
+<td align="left">five-point ratings given to case images by the readers</td>
+</tr>
+<tr class="even">
+<td align="left"><code>case2</code></td>
+<td align="left">example identifiers representing nesting of cases within readers</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>case3</code></td>
+<td align="left">example identifiers representing nesting of cases within treatments</td>
+</tr>
+</tbody>
+</table>
+<p>Data from other studies may be analyzed with the package and should follow the format of <code>VanDyke</code> with columns for reader, treatment, and case identifiers as well as true event statuses and reader ratings. The variable names, however, may be different.</p>
+</div>
+<div id="multi-reader-multi-case-analysis" class="section level1">
+<h1><span class="header-section-number">5</span> Multi-Reader Multi-Case Analysis</h1>
+<p>A multi-reader multi-case (MRMC) analysis, as the name suggests, involves multiple readers of multiple cases to compare reader performance metrics across two or more diagnostic tests. An MRMC analysis can be performed with a call to the <code>mrmc()</code> function to specify a reader performance metric, study variables and observations, and covariance estimation method.</p>
+<blockquote>
+<p><strong>MRMC Function</strong></p>
+<p><code>mrmc(response, test, reader, case, data, cov = jackknife)</code></p>
+<p><em>Description</em></p>
+<p>Returns an <code>mrmc</code> class object of data that can be used to estimate and compare reader performance metrics in a multi-reader multi-case statistical analysis.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>response</code>: object defining true case statuses, corresponding reader ratings, and a reader performance metric to compute on them.</li>
+<li><code>test</code>, <code>reader</code>, <code>case</code>: variables containing the test, reader, and case identifiers for the <code>response</code> observations.</li>
+<li><code>data</code>: data frame containing the response and identifier variables.</li>
+<li><code>cov</code>: function <code>jackknife</code>, <code>unbiased</code>, or <code>DeLong</code> to estimate reader performance metric covariances.</li>
+</ul>
+</blockquote>
+<p>The response variable in the <code>mrmc()</code> specification is defined with one of the performance metrics described in the following sections. Results from <code>mrmc()</code> can be displayed with <code>print()</code> and passed to <code>summary()</code> for statistical comparisons of the diagnostic tests. The summary call produces ANOVA results from a global test of equality of ROC AUC means across all tests and statistical tests of pairwise differences, along with confidence intervals for the differences and intervals for individual tests.</p>
+<blockquote>
+<p><strong>MRMC Summary Function</strong></p>
+<p><code>summary(object, conf.level = 0.95)</code></p>
+<p><em>Description</em></p>
+<p>Returns a <code>summary.mrmc</code> class object of statistical results from a multi-reader multi-case analysis.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>object</code>: results from <code>mrmc()</code>.</li>
+<li><code>conf.level</code>: confidence level for confidence intervals.</li>
+</ul>
+</blockquote>
+<div id="performance-metrics" class="section level2">
+<h2><span class="header-section-number">5.1</span> Performance Metrics</h2>
+<div id="area-under-the-roc-curve" class="section level3">
+<h3><span class="header-section-number">5.1.1</span> Area Under the ROC Curve</h3>
+<p>Area under the ROC curve is a measure of concordance between numeric reader ratings and true binary case statuses. It provides an estimate of the probability that a randomly selected positive case will have a higher rating than a negative case. ROC AUC values range from 0 to 1, with 0.5 representing no concordance and 1 perfect concordance. AUC can be computed with the functions described below for binormal, binormal likelihood-ratio, and empirical ROC curves. Empirical curves are also referred to as trapezoidal. The functions also support calculation of partial AUC over a range of sensitivities or specificities.</p>
+<blockquote>
+<p><strong>ROC AUC Functions</strong></p>
+<p><code>binormal_auc(truth, rating, partial = FALSE, min = 0, max = 1, normalize = FALSE)</code><br />
+<code>binormalLR_auc(truth, rating, partial = FALSE, min = 0, max = 1, normalize = FALSE)</code><br />
+<code>empirical_auc(truth, rating, partial = FALSE, min = 0, max = 1, normalize = FALSE)</code><br />
+<code>trapezoidal_auc(truth, rating, partial = FALSE, min = 0, max = 1, normalize = FALSE)</code></p>
+<p><em>Description</em></p>
+<p>Returns computed area under the receiver operating character curve estimated with a binormal model (<code>binormal_auc</code>), binormal likelihood-ratio model (<code>binormalLR_auc</code>), or empirically (<code>empirical_auc</code> or <code>trapezoidal_auc</code>).</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>truth</code>: vector of true binary case statuses, with positive status taken to be the highest level.</li>
+<li><code>rating</code>: numeric vector of case ratings.</li>
+<li><code>partial</code>: character string <code>&quot;sensitivity&quot;</code> or <code>&quot;specificity&quot;</code> for calculation of partial AUC, or <code>FALSE</code> for full AUC. Partial matching of the character strings is allowed. A value of <code>&quot;specificity&quot;</code> results in area under the ROC curve between the given <code>min</code> and <code>max</code> specificity values, whereas <code>&quot;sensitivity&quot;</code> results in area to the right of the curve between the given sensitivity values.</li>
+<li><code>min</code>, <code>max</code>: minimum and maximum sensitivity or specificity values over which to calculate partial AUC.</li>
+<li><code>normalize</code>: logical indicating whether partial AUC is divided by the interval width (<code>max - min</code>) over which it is calculated.</li>
+</ul>
+</blockquote>
+<p>In the example below, <code>mrmc()</code> is called to compare CINE MRI and SE MRI treatments in an MRMC analysis of areas under binormal ROC curves computed for the readers of cases in the VanDyke study.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">## Compare ROC AUC treatment means for the VanDyke example</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>est &lt;-<span class="st"> </span><span class="kw">mrmc</span>(</span>
+<span id="cb8-3"><a href="#cb8-3"></a>  <span class="kw">binormal_auc</span>(truth, rating), treatment, reader, case, <span class="dt">data =</span> VanDyke</span>
+<span id="cb8-4"><a href="#cb8-4"></a>)</span></code></pre></div>
+<pre><code>## Warning in binormal_params(data$truth, data$rating, ...): 
+## Binormal curve fit has AUC = 1 due to lack of interior points.
+## Consider fitting an empirical curve instead.</code></pre>
+<p>The <code>print()</code> function can be applied to <code>mrmc()</code> output to display information about the reader performance metrics, including the</p>
+<ul>
+<li>value of variable <code>truth</code> (1) defining positive case status,</li>
+<li>estimated performance metric values (<code>data$binormal_auc</code>) for each test (<code>$treatment</code>) and reader (<code>$reader</code>),</li>
+<li>number of cases read at each level of the factors (<code>N</code>), and</li>
+<li>error variance <span class="math inline">\(\sigma^2_\epsilon\)</span> and covariances <span class="math inline">\(\text{Cov}_1\)</span>, <span class="math inline">\(\text{Cov}_2\)</span>, and <span class="math inline">\(\text{Cov}_3\)</span>.</li>
+</ul>
+<details>
+<p><summary><strong>Show MRMC Performance Metrics</strong></summary></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">print</span>(est)</span></code></pre></div>
+<pre><code>## Call:
+## mrmc(response = binormal_auc(truth, rating), test = treatment, 
+##     reader = reader, case = case, data = VanDyke)
+## 
+## Positive truth status: 1 
+## 
+## Response metric data:
+## 
+## # A tibble: 10 × 2
+##        N data$binormal_auc $treatment $reader
+##    &lt;dbl&gt;             &lt;dbl&gt; &lt;fct&gt;      &lt;fct&gt;  
+##  1   114             0.933 1          1      
+##  2   114             0.890 1          2      
+##  3   114             0.929 1          3      
+##  4   114             0.970 1          4      
+##  5   114             0.833 1          5      
+##  6   114             0.951 2          1      
+##  7   114             0.935 2          2      
+##  8   114             0.928 2          3      
+##  9   114             1     2          4      
+## 10   114             0.945 2          5      
+## 
+## ANOVA Table:
+## 
+##                  Df    Sum Sq   Mean Sq
+## treatment         1 0.0041142 0.0041142
+## reader            4 0.0104325 0.0026081
+## treatment:reader  4 0.0037916 0.0009479
+## 
+## 
+## Obuchowski-Rockette error variance and covariance estimates:
+## 
+##           Estimate Correlation
+## Error 0.0010790500          NA
+## Cov1  0.0003125013   0.2896078
+## Cov2  0.0003115986   0.2887713
+## Cov3  0.0001937688   0.1795735</code></pre>
+</details>
+<p>
+<p>MRMC statistical tests are performed with a call to <code>summary()</code>. Results include a test of the global null hypothesis that performances are equal across all diagnostic tests, tests of their pairwise mean differences, and estimated mean performances for each one.</p>
+<details>
+<p><summary><strong>Show MRMC Test Results</strong></summary></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## Multi-Reader Multi-Case Analysis of Variance
+## Data: VanDyke
+## Factor types: Random Readers and Random Cases
+## Covariance method: jackknife
+## 
+## Experimental design: factorial 
+## 
+## Obuchowski-Rockette variance component and covariance estimates:
+## 
+##                      Estimate Correlation
+## reader           0.0007113799          NA
+## treatment:reader 0.0002991713          NA
+## Error            0.0010790500          NA
+## Cov1             0.0003125013   0.2896078
+## Cov2             0.0003115986   0.2887713
+## Cov3             0.0001937688   0.1795735
+## 
+## 
+## ANOVA global test of equal treatment binormal_auc:
+##         MS(T)      MS(T:R)         Cov2         Cov3 Denominator        F df1
+## 1 0.004114188 0.0009478901 0.0003115986 0.0001937688 0.001537039 2.676697   1
+##        df2   p-value
+## 1 10.51753 0.1313668
+## 
+## 
+## 95% CIs and tests for treatment binormal_auc pairwise differences:
+##   Comparison    Estimate     StdErr       df    CI.Lower    CI.Upper         t
+## 1      1 - 2 -0.04056692 0.02479548 10.51753 -0.09544840  0.01431455 -1.636061
+##     p-value
+## 1 0.1313668
+## 
+## 
+## 95% treatment binormal_auc CIs (each analysis based only on data for the
+## specified treatment):
+##    Estimate        MS(R)         Cov2     StdErr       df  CI.Lower  CI.Upper
+## 1 0.9109867 0.0027417526 0.0004612201 0.03177374 13.55866 0.8426301 0.9793433
+## 2 0.9515536 0.0008142524 0.0001619772 0.01802298 15.91432 0.9133299 0.9897774</code></pre>
+</details>
+<p>
+<p>ROC curves estimated by <code>mrmc()</code> can be displayed with <code>plot()</code> and their parameters extracted with <code>parameters()</code>.</p>
+<details>
+<p><summary><strong>Show MRMC ROC Curves</strong></summary></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">plot</span>(est)</span></code></pre></div>
+<pre><code>## Warning in binormal_params(data$truth, data$rating, ...): 
+## Binormal curve fit has AUC = 1 due to lack of interior points.
+## Consider fitting an empirical curve instead.</code></pre>
+<img src="data:image/png;base64,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" /><!-- -->
+</details>
+<details>
+<p><summary><strong>Show MRMC ROC Curve Parameters</strong></summary></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">print</span>(<span class="kw">parameters</span>(est))</span></code></pre></div>
+<pre><code>## Warning in binormal_params(data$truth, data$rating, ...): 
+## Binormal curve fit has AUC = 1 due to lack of interior points.
+## Consider fitting an empirical curve instead.</code></pre>
+<pre><code>## # A tibble: 10 × 3
+##    Group$reader $treatment      a     b
+##    &lt;fct&gt;        &lt;fct&gt;       &lt;dbl&gt; &lt;dbl&gt;
+##  1 1            1            1.70 0.537
+##  2 2            1            1.40 0.561
+##  3 3            1            1.74 0.635
+##  4 4            1            1.93 0.202
+##  5 5            1            1.06 0.464
+##  6 1            2            1.85 0.503
+##  7 2            2            1.66 0.447
+##  8 3            2            1.62 0.488
+##  9 4            2          Inf    1    
+## 10 5            2            1.73 0.422</code></pre>
+</details>
+<p>
+</div>
+<div id="roc-curve-expected-utility" class="section level3">
+<h3><span class="header-section-number">5.1.2</span> ROC Curve Expected Utility</h3>
+<p>As an alternative to AUC as a summary of ROC curves, Abbey et al. <span class="citation">(2013)</span> propose an expected utility metric defined as <span class="math display">\[
+\text{EU} = \max_\text{FPR}(\text{TPR}(\text{FPR}) - \beta \times \text{FPR}),
+\]</span> where <span class="math inline">\(\text{TPR}(\text{FPR})\)</span> are true positive rates on the ROC curve, and FPR are false positive rates ranging from 0 to 1.</p>
+<blockquote>
+<p><strong>ROC Curve Expected Utility Functions</strong></p>
+<p><code>binormal_eu(truth, rating, slope = 1)</code><br />
+<code>binormalLR_eu(truth, rating, slope = 1)</code><br />
+<code>empirical_eu(truth, rating, slope = 1)</code><br />
+<code>trapezoidal_eu(truth, rating, slope = 1)</code></p>
+<p><em>Description</em></p>
+<p>Returns expected utility of an ROC curve.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>truth</code>: vector of true binary case statuses, with positive status taken to be the highest level.</li>
+<li><code>rating</code>: numeric vector of case ratings.</li>
+<li><code>slope</code>: numeric slope (<span class="math inline">\(\beta\)</span>) at which to compute expected utility.</li>
+</ul>
+</blockquote>
+</div>
+<div id="roc-curve-sensitivity-and-specificity" class="section level3">
+<h3><span class="header-section-number">5.1.3</span> ROC Curve Sensitivity and Specificity</h3>
+<p>Functions are provided to extract sensitivity from an ROC curve for a given specificity and vice versa.</p>
+<blockquote>
+<p><strong>ROC Curve Sensitivity and Specificity Functions</strong></p>
+<p><code>binormal_sens(truth, rating, spec)</code><br />
+<code>binormal_spec(truth, rating, sens)</code><br />
+<code>binormalLR_sens(truth, rating, spec)</code><br />
+<code>binormalLR_spec(truth, rating, sens)</code><br />
+<code>empirical_sens(truth, rating, spec)</code><br />
+<code>empirical_spec(truth, rating, sens)</code><br />
+<code>trapezoidal_sens(truth, rating, spec)</code><br />
+<code>trapezoidal_spec(truth, rating, sens)</code></p>
+<p><em>Description</em></p>
+<p>Returns the sensitivity/specificity from an ROC curve at a specified specificity/sensitivity.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>truth</code>: vector of true binary case statuses, with positive status taken to be the highest level.</li>
+<li><code>rating</code>: numeric vector of case ratings.</li>
+<li><code>spec</code>, <code>sens</code>: specificity/sensitivity on the ROC curve at which to return sensitivity/specificity.</li>
+</ul>
+</blockquote>
+</div>
+<div id="binary-metrics" class="section level3">
+<h3><span class="header-section-number">5.1.4</span> Binary Metrics</h3>
+<p>Metrics for binary reader ratings are also available.</p>
+<blockquote>
+<p><strong>Sensitivity and Specificity Functions</strong></p>
+<p><code>binary_sens(truth, rating)</code><br />
+<code>binary_spec(truth, rating)</code></p>
+<p><em>Description</em></p>
+<p>Returns the sensitivity or specificity.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>truth</code>: vector of true binary case statuses, with positive status taken to be the highest level.</li>
+<li><code>rating</code>: factor or numeric vector of 0-1 binary ratings.</li>
+</ul>
+</blockquote>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co">## Compare sensitivity for binary classification</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a>VanDyke<span class="op">$</span>binary_rating &lt;-<span class="st"> </span>VanDyke<span class="op">$</span>rating <span class="op">&gt;=</span><span class="st"> </span><span class="dv">3</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a>est &lt;-<span class="st"> </span><span class="kw">mrmc</span>(</span>
+<span id="cb19-4"><a href="#cb19-4"></a>  <span class="kw">binary_sens</span>(truth, binary_rating), treatment, reader, case, <span class="dt">data =</span> VanDyke</span>
+<span id="cb19-5"><a href="#cb19-5"></a>)</span></code></pre></div>
+<details>
+<p><summary><strong>Show MRMC Performance Metrics</strong></summary></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">print</span>(est)</span></code></pre></div>
+<pre><code>## Call:
+## mrmc(response = binary_sens(truth, binary_rating), test = treatment, 
+##     reader = reader, case = case, data = VanDyke)
+## 
+## Positive truth status: 1 
+## 
+## Response metric data:
+## 
+## # A tibble: 10 × 2
+##        N data$binary_sens $treatment $reader
+##    &lt;dbl&gt;            &lt;dbl&gt; &lt;fct&gt;      &lt;fct&gt;  
+##  1    45            0.889 1          1      
+##  2    45            0.778 1          2      
+##  3    45            0.822 1          3      
+##  4    45            0.933 1          4      
+##  5    45            0.689 1          5      
+##  6    45            0.978 2          1      
+##  7    45            0.822 2          2      
+##  8    45            0.911 2          3      
+##  9    45            1     2          4      
+## 10    45            0.889 2          5      
+## 
+## ANOVA Table:
+## 
+##                  Df   Sum Sq   Mean Sq
+## treatment         1 0.023901 0.0239012
+## reader            4 0.049679 0.0124198
+## treatment:reader  4 0.007210 0.0018025
+## 
+## 
+## Obuchowski-Rockette error variance and covariance estimates:
+## 
+##           Estimate Correlation
+## Error 0.0023681257          NA
+## Cov1  0.0009943883   0.4199052
+## Cov2  0.0010145903   0.4284360
+## Cov3  0.0006604938   0.2789100</code></pre>
+</details>
+<details>
+<p><summary><strong>Show MRMC Test Results</strong></summary></p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## Multi-Reader Multi-Case Analysis of Variance
+## Data: VanDyke
+## Factor types: Random Readers and Random Cases
+## Covariance method: jackknife
+## 
+## Experimental design: factorial 
+## 
+## Obuchowski-Rockette variance component and covariance estimates:
+## 
+##                      Estimate Correlation
+## reader           0.0049747475          NA
+## treatment:reader 0.0007828283          NA
+## Error            0.0023681257          NA
+## Cov1             0.0009943883   0.4199052
+## Cov2             0.0010145903   0.4284360
+## Cov3             0.0006604938   0.2789100
+## 
+## 
+## ANOVA global test of equal treatment binary_sens:
+##        MS(T)     MS(T:R)       Cov2         Cov3 Denominator        F df1
+## 1 0.02390123 0.001802469 0.00101459 0.0006604938 0.003572952 6.689493   1
+##        df2    p-value
+## 1 15.71732 0.02008822
+## 
+## 
+## 95% CIs and tests for treatment binary_sens pairwise differences:
+##   Comparison    Estimate     StdErr       df   CI.Lower   CI.Upper         t
+## 1      1 - 2 -0.09777778 0.03780451 15.71732 -0.1780371 -0.0175185 -2.586405
+##      p-value
+## 1 0.02008822
+## 
+## 
+## 95% treatment binary_sens CIs (each analysis based only on data for the
+## specified treatment):
+##    Estimate       MS(R)        Cov2     StdErr        df  CI.Lower  CI.Upper
+## 1 0.8222222 0.009135802 0.001646465 0.05893747 14.456811 0.6961876 0.9482568
+## 2 0.9200000 0.005086420 0.000382716 0.03741657  7.575855 0.8328691 1.0000000</code></pre>
+</details>
+<p>
+</div>
+</div>
+<div id="covariance-estimation-methods" class="section level2">
+<h2><span class="header-section-number">5.2</span> Covariance Estimation Methods</h2>
+<p>Special statistical methods are needed in MRMC analyses to estimate covariances between performance metrics from different readers and tests when cases are treated as a random sample and are rated by more than one reader or evaluated with more than one test. For this estimation, the package provides the DeLong method <span class="citation">(DeLong, DeLong, and Clarke-Pearson 1988)</span>, jackknifing <span class="citation">(Efron 1982)</span>, and an unbiased method <span class="citation">(Gallas, Pennello, and Meyers 2007)</span>. The applicability of each depends on the study design as well as the performance metric being analyzed. DeLong is appropriate for a balanced factorial design and empirical ROC AUC, jackknifing for any design and metric, and unbiased for any design and empirical ROC AUC.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Covariance Method</th>
+<th align="left">Study Design</th>
+<th align="left">Metric</th>
+<th align="left">Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">DeLong</td>
+<td align="left">Factorial</td>
+<td align="left">Empirical ROC AUC</td>
+<td align="left"><code>DeLong()</code></td>
+</tr>
+<tr class="even">
+<td align="left">Jackknife</td>
+<td align="left">Any</td>
+<td align="left">Any</td>
+<td align="left"><code>jackknife()</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Unbiased</td>
+<td align="left">Any</td>
+<td align="left">Empirical ROC AUC</td>
+<td align="left"><code>unbiased()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Jackknifing is the default covariance method for <code>mrmc()</code>. Others can be specified with its <code>cov</code> argument.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co">## DeLong method</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>est &lt;-<span class="st"> </span><span class="kw">mrmc</span>(</span>
+<span id="cb24-3"><a href="#cb24-3"></a>  <span class="kw">empirical_auc</span>(truth, rating), treatment, reader, case, <span class="dt">data =</span> VanDyke,</span>
+<span id="cb24-4"><a href="#cb24-4"></a>  <span class="dt">cov =</span> DeLong</span>
+<span id="cb24-5"><a href="#cb24-5"></a>)</span></code></pre></div>
+<details>
+<p><summary><strong>Show MRMC Test Results</strong></summary></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## Multi-Reader Multi-Case Analysis of Variance
+## Data: VanDyke
+## Factor types: Random Readers and Random Cases
+## Covariance method: DeLong
+## 
+## Experimental design: factorial 
+## 
+## Obuchowski-Rockette variance component and covariance estimates:
+## 
+##                      Estimate Correlation
+## reader           0.0015364254          NA
+## treatment:reader 0.0002045840          NA
+## Error            0.0007921325          NA
+## Cov1             0.0003420090   0.4317573
+## Cov2             0.0003395265   0.4286234
+## Cov3             0.0002358497   0.2977402
+## 
+## 
+## ANOVA global test of equal treatment empirical_auc:
+##         MS(T)      MS(T:R)         Cov2         Cov3 Denominator        F df1
+## 1 0.004796171 0.0005510306 0.0003395265 0.0002358497 0.001069415 4.484854   1
+##        df2    p-value
+## 1 15.06611 0.05123303
+## 
+## 
+## 95% CIs and tests for treatment empirical_auc pairwise differences:
+##   Comparison    Estimate    StdErr       df      CI.Lower      CI.Upper
+## 1      1 - 2 -0.04380032 0.0206825 15.06611 -0.0878671960  0.0002665519
+##           t    p-value
+## 1 -2.117747 0.05123303
+## 
+## 
+## 95% treatment empirical_auc CIs (each analysis based only on data for the
+## specified treatment):
+##    Estimate       MS(R)         Cov2     StdErr       df  CI.Lower  CI.Upper
+## 1 0.8970370 0.003082629 0.0004775239 0.03307642 12.59597 0.8253461 0.9687280
+## 2 0.9408374 0.001304602 0.0002015292 0.02150464 12.56530 0.8942155 0.9874592</code></pre>
+</details>
+<p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="co">## Unbiased method</span></span>
+<span id="cb27-2"><a href="#cb27-2"></a>est &lt;-<span class="st"> </span><span class="kw">mrmc</span>(</span>
+<span id="cb27-3"><a href="#cb27-3"></a>  <span class="kw">empirical_auc</span>(truth, rating), treatment, reader, case, <span class="dt">data =</span> VanDyke,</span>
+<span id="cb27-4"><a href="#cb27-4"></a>  <span class="dt">cov =</span> unbiased</span>
+<span id="cb27-5"><a href="#cb27-5"></a>)</span></code></pre></div>
+<details>
+<p><summary><strong>Show MRMC Test Results</strong></summary></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## Multi-Reader Multi-Case Analysis of Variance
+## Data: VanDyke
+## Factor types: Random Readers and Random Cases
+## Covariance method: unbiased
+## 
+## Experimental design: factorial 
+## 
+## Obuchowski-Rockette variance component and covariance estimates:
+## 
+##                      Estimate Correlation
+## reader           0.0015365290          NA
+## treatment:reader 0.0002077588          NA
+## Error            0.0007883925          NA
+## Cov1             0.0003416706   0.4333762
+## Cov2             0.0003390650   0.4300713
+## Cov3             0.0002356148   0.2988547
+## 
+## 
+## ANOVA global test of equal treatment empirical_auc:
+##         MS(T)      MS(T:R)        Cov2         Cov3 Denominator        F df1
+## 1 0.004796171 0.0005510306 0.000339065 0.0002356148 0.001068281 4.489614   1
+##        df2   p-value
+## 1 15.03418 0.0511618
+## 
+## 
+## 95% CIs and tests for treatment empirical_auc pairwise differences:
+##   Comparison    Estimate     StdErr       df      CI.Lower      CI.Upper
+## 1      1 - 2 -0.04380032 0.02067154 15.03418 -0.0878519409  0.0002512968
+##           t   p-value
+## 1 -2.118871 0.0511618
+## 
+## 
+## 95% treatment empirical_auc CIs (each analysis based only on data for the
+## specified treatment):
+##    Estimate       MS(R)         Cov2    StdErr       df  CI.Lower  CI.Upper
+## 1 0.8970370 0.003082629 0.0004771788 0.0330712 12.58802 0.8253526 0.9687214
+## 2 0.9408374 0.001304602 0.0002009512 0.0214912 12.53391 0.8942323 0.9874424</code></pre>
+</details>
+<p>
+</div>
+<div id="fixed-factors" class="section level2">
+<h2><span class="header-section-number">5.3</span> Fixed Factors</h2>
+<p>By default, readers and cases are treated as random effects by <code>mrmc()</code>. Random effects are the appropriate designations when inference is intended for the larger population from which study readers and cases are considered to be a random sample. Either, but not both, can be specified as fixed effects with the <code>fixed()</code> function in applications where study readers or cases make up the entire group to which inference is intended. When readers are designated as fixed, <code>mrmc()</code> test results additionally include reader-specific pairwise comparisons of the diagnostic tests as well as mean estimates of the performance metric for each reader-test combination.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="co">## Fixed readers</span></span>
+<span id="cb30-2"><a href="#cb30-2"></a>est &lt;-<span class="st"> </span><span class="kw">mrmc</span>(</span>
+<span id="cb30-3"><a href="#cb30-3"></a>  <span class="kw">empirical_auc</span>(truth, rating), treatment, <span class="kw">fixed</span>(reader), case, <span class="dt">data =</span> VanDyke</span>
+<span id="cb30-4"><a href="#cb30-4"></a>)</span></code></pre></div>
+<details>
+<p><summary><strong>Show MRMC Test Results</strong></summary></p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## Multi-Reader Multi-Case Analysis of Variance
+## Data: VanDyke
+## Factor types: Fixed Readers and Random Cases
+## Covariance method: jackknife
+## 
+## Experimental design: factorial 
+## 
+## Obuchowski-Rockette variance component and covariance estimates:
+## 
+##                      Estimate Correlation
+## reader           0.0015349993          NA
+## treatment:reader 0.0002004025          NA
+## Error            0.0008022883          NA
+## Cov1             0.0003466137   0.4320314
+## Cov2             0.0003440748   0.4288668
+## Cov3             0.0002390284   0.2979333
+## 
+## 
+## ANOVA global test of equal treatment empirical_auc:
+##         MS(T)         Cov1         Cov2         Cov3  Denominator       X2 df
+## 1 0.004796171 0.0003466137 0.0003440748 0.0002390284 0.0008758604 5.475953  1
+##      p-value
+## 1 0.01927984
+## 
+## 
+## 95% CIs and tests for treatment empirical_auc pairwise differences:
+##   Comparison    Estimate     StdErr    CI.Lower    CI.Upper         z
+## 1      1 - 2 -0.04380032 0.01871748 -0.08048591 -0.00711473 -2.340075
+##      p-value
+## 1 0.01927984
+## 
+## 
+## 95% treatment empirical_auc CIs (each analysis based only on data for the
+## specified treatment):
+##    Estimate   Var(Error)         Cov2     StdErr  CI.Lower  CI.Upper
+## 1 0.8970370 0.0010141028 0.0004839618 0.02428971 0.8494301 0.9446440
+## 2 0.9408374 0.0005904738 0.0002041879 0.01677632 0.9079564 0.9737183
+## 
+## 
+## Reader-specific 95% CIs and tests for empirical_auc pairwise differences (each
+## analysis based only on data for the specified reader):
+##   Reader Comparison    Estimate     StdErr     CI.Lower     CI.Upper          z
+## 1      1      1 - 2 -0.02818035 0.02551213 -0.078183215  0.021822507 -1.1045864
+## 2      2      1 - 2 -0.04653784 0.02630183 -0.098088476  0.005012792 -1.7693768
+## 3      3      1 - 2 -0.01787440 0.03120965 -0.079044180  0.043295388 -0.5727202
+## 4      4      1 - 2 -0.02624799 0.01729129 -0.060138290  0.007642316 -1.5179891
+## 5      5      1 - 2 -0.10016103 0.04405746 -0.186512066 -0.013809995 -2.2734182
+##      p-value
+## 1 0.26933885
+## 2 0.07683102
+## 3 0.56683414
+## 4 0.12901715
+## 5 0.02300099
+## 
+## 
+## Single reader 95% CIs:
+##    empirical_auc treatment reader       StdErr  CI.Lower  CI.Upper
+## 1      0.9196457         1      1 0.0301255164 0.8606008 0.9786907
+## 2      0.8587762         1      2 0.0363753335 0.7874818 0.9300705
+## 3      0.9038647         1      3 0.0282594118 0.8484773 0.9592522
+## 4      0.9731079         1      4 0.0173388332 0.9391244 1.0000000
+## 5      0.8297907         1      5 0.0417201720 0.7480206 0.9115607
+## 6      0.9478261         2      1 0.0221416887 0.9044292 0.9912230
+## 7      0.9053140         2      2 0.0298151099 0.8468775 0.9637506
+## 8      0.9217391         2      3 0.0297673065 0.8633963 0.9800820
+## 9      0.9993559         2      4 0.0007213348 0.9979421 1.0000000
+## 10     0.9299517         2      5 0.0262023046 0.8785961 0.9813073</code></pre>
+</details>
+<p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="co">## Fixed cases</span></span>
+<span id="cb33-2"><a href="#cb33-2"></a>est &lt;-<span class="st"> </span><span class="kw">mrmc</span>(</span>
+<span id="cb33-3"><a href="#cb33-3"></a>  <span class="kw">empirical_auc</span>(truth, rating), treatment, reader, <span class="kw">fixed</span>(case), <span class="dt">data =</span> VanDyke</span>
+<span id="cb33-4"><a href="#cb33-4"></a>)</span></code></pre></div>
+<details>
+<p><summary><strong>Show MRMC Test Results</strong></summary></p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## Multi-Reader Multi-Case Analysis of Variance
+## Data: VanDyke
+## Factor types: Random Readers and Fixed Cases
+## Experimental design: factorial 
+## 
+## Obuchowski-Rockette variance component and covariance estimates:
+## 
+## Not applicable because cases are fixed
+## 
+## 
+## ANOVA global test of equal treatment empirical_auc:
+##         MS(T)      MS(T:R)     F df1 df2    p-value
+## 1 0.004796171 0.0005510306 8.704   1   4 0.04195875
+## 
+## 
+## 95% CIs and tests for treatment empirical_auc pairwise differences:
+##   Comparison    Estimate df     StdErr    CI.Lower    CI.Upper         t
+## 1      1 - 2 -0.04380032  4 0.01484629 -0.08502022 -0.00258042 -2.950254
+##      p-value
+## 1 0.04195875
+## 
+## 
+## 95% treatment empirical_auc CIs (each analysis based only on data for the
+## specified treatment):
+##    Estimate       MS(R)     StdErr df  CI.Lower  CI.Upper
+## 1 0.8970370 0.003082629 0.02482994  4 0.8280981 0.9659760
+## 2 0.9408374 0.001304602 0.01615303  4 0.8959894 0.9856854</code></pre>
+</details>
+<p>
+</div>
+<div id="study-designs" class="section level2">
+<h2><span class="header-section-number">5.4</span> Study Designs</h2>
+<p><strong>MRMCaov</strong> supports factorial, nested, and partially paired study designs. In a factorial design, one set of cases is evaluated by all readers and tests. This is the design employed by the VanDyke study as indicated by its dataset <code>case</code> identifier values which appear within each combination of the <code>reader</code> and <code>treatment</code> identifiers. Designs in which a different set of cases is evaluated by each reader or with each test can be specified with unique codings of case identifiers within the corresponding nesting factor. Example codings for these two nested designs are included in the <code>VanDyke</code> dataset as <code>case2</code> and <code>case3</code>. The <code>case2</code> identifiers differ from reader to reader and thus represent a study design in which cases are nested within readers. Likewise, the <code>case3</code> identifiers differ by test and are an example design of cases nested within tests. Additionally, the package supports partially paired designs in which ratings may not be available on all cases for some readers or tests; e.g., as a result of missing values. Nested and partially paired designs require specification of jackknife (default) or unbiased as the covariance estimation method.</p>
+<pre><code>## Case identifier codings for factorial and nested study designs</code></pre>
+<pre><code>##            Observation
+## Factor      1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17 
+##   reader    1   1   2   2   3   3   4   4   5   5   1   1   2   2   3   3   4  
+##   treatment 1   2   1   2   1   2   1   2   1   2   1   2   1   2   1   2   1  
+##   case      1   1   1   1   1   1   1   1   1   1   2   2   2   2   2   2   2  
+##   case2     1.1 1.1 2.1 2.1 3.1 3.1 4.1 4.1 5.1 5.1 1.2 1.2 2.2 2.2 3.2 3.2 4.2
+##   case3     1.1 2.1 1.1 2.1 1.1 2.1 1.1 2.1 1.1 2.1 1.2 2.2 1.2 2.2 1.2 2.2 1.2
+##            Observation
+## Factor      18  19  20  21  22  23  24  25  26  27  28  29  30 
+##   reader    4   5   5   1   1   2   2   3   3   4   4   5   5  
+##   treatment 2   1   2   1   2   1   2   1   2   1   2   1   2  
+##   case      2   2   2   3   3   3   3   3   3   3   3   3   3  
+##   case2     4.2 5.2 5.2 1.3 1.3 2.3 2.3 3.3 3.3 4.3 4.3 5.3 5.3
+##   case3     2.2 1.2 2.2 1.3 2.3 1.3 2.3 1.3 2.3 1.3 2.3 1.3 2.3</code></pre>
+<pre><code>## ... with 1110 more observations</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a><span class="co">## Cases nested within readers</span></span>
+<span id="cb39-2"><a href="#cb39-2"></a>est &lt;-<span class="st"> </span><span class="kw">mrmc</span>(</span>
+<span id="cb39-3"><a href="#cb39-3"></a>  <span class="kw">empirical_auc</span>(truth, rating), treatment, reader, case2, <span class="dt">data =</span> VanDyke</span>
+<span id="cb39-4"><a href="#cb39-4"></a>)</span></code></pre></div>
+<details>
+<p><summary><strong>Show MRMC Test Results</strong></summary></p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## Multi-Reader Multi-Case Analysis of Variance
+## Data: VanDyke
+## Factor types: Random Readers and Random Cases
+## Covariance method: jackknife
+## 
+## Experimental design: cases nested within reader 
+## 
+## Obuchowski-Rockette variance component and covariance estimates:
+## 
+##                      Estimate Correlation
+## reader           1.293517e-03          NA
+## treatment:reader 9.213005e-05          NA
+## Error            8.079682e-04          NA
+## Cov1             3.490676e-04   0.4320314
+## Cov2             0.000000e+00   0.0000000
+## Cov3             0.000000e+00   0.0000000
+## 
+## 
+## ANOVA global test of equal treatment empirical_auc:
+##         MS(T)      MS(T:R) Cov2 Cov3  Denominator     F df1 df2    p-value
+## 1 0.004796171 0.0005510306    0    0 0.0005510306 8.704   1   4 0.04195875
+## 
+## 
+## 95% CIs and tests for treatment empirical_auc pairwise differences:
+##   Comparison    Estimate     StdErr df    CI.Lower    CI.Upper         t
+## 1      1 - 2 -0.04380032 0.01484629  4 -0.08502022 -0.00258042 -2.950254
+##      p-value
+## 1 0.04195875
+## 
+## 
+## 95% treatment empirical_auc CIs (each analysis based only on data for the
+## specified treatment):
+##    Estimate       MS(R) Cov2     StdErr df  CI.Lower  CI.Upper
+## 1 0.8970370 0.003082629    0 0.02482994  4 0.8280981 0.9659760
+## 2 0.9408374 0.001304602    0 0.01615303  4 0.8959894 0.9856854</code></pre>
+</details>
+<p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a><span class="co">## Cases nested within tests</span></span>
+<span id="cb42-2"><a href="#cb42-2"></a>est &lt;-<span class="st"> </span><span class="kw">mrmc</span>(</span>
+<span id="cb42-3"><a href="#cb42-3"></a>  <span class="kw">empirical_auc</span>(truth, rating), treatment, reader, case3, <span class="dt">data =</span> VanDyke</span>
+<span id="cb42-4"><a href="#cb42-4"></a>)</span></code></pre></div>
+<details>
+<p><summary><strong>Show MRMC Test Results</strong></summary></p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## Multi-Reader Multi-Case Analysis of Variance
+## Data: VanDyke
+## Factor types: Random Readers and Random Cases
+## Covariance method: jackknife
+## 
+## Experimental design: cases nested within treatment 
+## 
+## Obuchowski-Rockette variance component and covariance estimates:
+## 
+##                      Estimate Correlation
+## reader           1.642585e-03          NA
+## treatment:reader 9.078969e-05          NA
+## Error            8.058382e-04          NA
+## Cov1             0.000000e+00   0.0000000
+## Cov2             3.455973e-04   0.4288668
+## Cov3             0.000000e+00   0.0000000
+## 
+## 
+## ANOVA global test of equal treatment empirical_auc:
+##         MS(T)      MS(T:R)         Cov2 Cov3 Denominator        F df1      df2
+## 1 0.004796171 0.0005510306 0.0003455973    0 0.002279017 2.104491   1 68.42325
+##     p-value
+## 1 0.1514363
+## 
+## 
+## 95% CIs and tests for treatment empirical_auc pairwise differences:
+##   Comparison    Estimate     StdErr       df    CI.Lower    CI.Upper         t
+## 1      1 - 2 -0.04380032 0.03019283 68.42325 -0.10404242  0.01644178 -1.450686
+##     p-value
+## 1 0.1514363
+## 
+## 
+## 95% treatment empirical_auc CIs (each analysis based only on data for the
+## specified treatment):
+##    Estimate       MS(R)         Cov2     StdErr       df  CI.Lower  CI.Upper
+## 1 0.8970370 0.003082629 0.0004861032 0.03320586 12.79430 0.8251827 0.9688914
+## 2 0.9408374 0.001304602 0.0002050913 0.02158730 12.75962 0.8941114 0.9875634</code></pre>
+</details>
+<p>
+</div>
+</div>
+<div id="single-reader-multi-case-analysis" class="section level1">
+<h1><span class="header-section-number">6</span> Single-Reader Multi-Case Analysis</h1>
+<p>A single-reader multi-case (SRMC) analysis involves a single readers of multiple cases to compare reader performance metrics across two or more diagnostic tests. An SRMC analysis can be performed with a call to <code>srmc()</code>.</p>
+<blockquote>
+<p><strong>SRMC Function</strong></p>
+<p><code>srmc(response, test, case, data, cov = jackknife)</code></p>
+<p><em>Description</em></p>
+<p>Returns an <code>srmc</code> class object of data that can be used to estimate and compare reader performance metrics in a single-reader multi-case statistical analysis.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>response</code>: object defining true case statuses, corresponding reader ratings, and a reader performance metric to compute on them.</li>
+<li><code>test</code>, <code>case</code>: variables containing the test and case identifiers for the <code>response</code> observations.</li>
+<li><code>data</code>: data frame containing the response and identifier variables.</li>
+<li><code>cov</code>: function <code>jackknife</code>, <code>unbiased</code>, or <code>DeLong</code> to estimate reader performance metric covariances.</li>
+</ul>
+</blockquote>
+<p>The function is used similar to <code>mrmc()</code> but without the <code>reader</code> argument. Below is an example SRMC analysis performed with one of the readers from the <code>VanDyke</code> dataset.</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="co">## Subset VanDyke dataset by reader 1</span></span>
+<span id="cb45-2"><a href="#cb45-2"></a>VanDyke1 &lt;-<span class="st"> </span><span class="kw">subset</span>(VanDyke, reader <span class="op">==</span><span class="st"> &quot;1&quot;</span>)</span>
+<span id="cb45-3"><a href="#cb45-3"></a></span>
+<span id="cb45-4"><a href="#cb45-4"></a><span class="co">## Compare ROC AUC treatment means for reader 1</span></span>
+<span id="cb45-5"><a href="#cb45-5"></a>est &lt;-<span class="st"> </span><span class="kw">srmc</span>(<span class="kw">binormal_auc</span>(truth, rating), treatment, case, <span class="dt">data =</span> VanDyke1)</span></code></pre></div>
+<details>
+<p><summary><strong>Show SRMC Performance Metrics</strong></summary></p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a><span class="kw">print</span>(est)</span></code></pre></div>
+<pre><code>## Call:
+## srmc(response = binormal_auc(truth, rating), test = treatment, 
+##     case = case, data = VanDyke1)
+## 
+## Positive truth status: 1 
+## 
+## Response metric data:
+## 
+## # A tibble: 2 × 2
+##       N data$binormal_auc $treatment $reader
+##   &lt;dbl&gt;             &lt;dbl&gt; &lt;fct&gt;      &lt;fct&gt;  
+## 1   114             0.933 1          1      
+## 2   114             0.951 2          1      
+## 
+## ANOVA Table:
+## 
+##                  Df     Sum Sq    Mean Sq
+## treatment         1 0.00010393 0.00010393
+## reader            0 0.00000000 0.00000000
+## treatment:reader  0 0.00000000 0.00000000
+## 
+## 
+## Obuchowski-Rockette error variance and covariance estimates:
+## 
+##           Estimate Correlation
+## Error 0.0008371345          NA
+## Cov1  0.0004275594   0.5107416
+## Cov2  0.0000000000   0.0000000
+## Cov3  0.0000000000   0.0000000</code></pre>
+</details>
+<details>
+<p><summary><strong>Show SRMC ROC Curves</strong></summary></p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a><span class="kw">plot</span>(est)</span></code></pre></div>
+<img src="data:image/png;base64,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" /><!-- -->
+</details>
+<details>
+<p><summary><strong>Show SRMC ROC Curve Parameters</strong></summary></p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a><span class="kw">print</span>(<span class="kw">parameters</span>(est))</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 3
+##   Group$reader $treatment     a     b
+##   &lt;fct&gt;        &lt;fct&gt;      &lt;dbl&gt; &lt;dbl&gt;
+## 1 1            1           1.70 0.537
+## 2 1            2           1.85 0.503</code></pre>
+</details>
+<details>
+<p><summary><strong>Show SRMC Test Results</strong></summary></p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## Single-Reader Multi-Case Analysis of Variance
+## Data: VanDyke1
+## Factor types: Fixed Readers and Random Cases
+## Covariance method: jackknife
+## 
+## Experimental design: cases nested within reader 
+## 
+## Obuchowski-Rockette variance component and covariance estimates:
+## 
+##           Estimate Correlation
+## Error 0.0008371345          NA
+## Cov1  0.0004275594   0.5107416
+## Cov2  0.0000000000   0.0000000
+## Cov3  0.0000000000   0.0000000
+## 
+## 
+## 95% CIs and tests for treatment binormal_auc pairwise differences:
+##   Comparison    Estimate    StdErr    CI.Lower    CI.Upper         z  p-value
+## 1      1 - 2 -0.01765763 0.0286208 -0.07375337  0.03843810 -0.616951 0.537267
+## 
+## 
+## Single reader 95% CIs:
+##   binormal_auc treatment reader     StdErr  CI.Lower  CI.Upper
+## 1    0.9331609         1      1 0.03348342 0.8675346 0.9987872
+## 2    0.9508186         2      1 0.02351871 0.9047228 0.9969144</code></pre>
+</details>
+<p>
+</div>
+<div id="single-test-multi-case-analysis" class="section level1">
+<h1><span class="header-section-number">7</span> Single-Test Multi-Case Analysis</h1>
+<p>A single-test and single-reader multi-case (STMC) analysis involves a single reader of multiple cases to estimate a reader performance metric for one diagnostic test. An STMC analysis can be performed with a call to <code>stmc()</code>.</p>
+<blockquote>
+<p><strong>STMC Function</strong></p>
+<p><code>stmc(response, case, data, cov = jackknife)</code></p>
+<p><em>Description</em></p>
+<p>Returns an <code>stmc</code> class object of data that can be used to estimate a reader performance metric in a single-test and single-reader multi-case statistical analysis.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>response</code>: object defining true case statuses, corresponding reader ratings, and a reader performance metric to compute on them.</li>
+<li><code>case</code>: variable containing the case identifiers for the <code>response</code> observations.</li>
+<li><code>data</code>: data frame containing the response and identifier variables.</li>
+<li><code>cov</code>: function <code>jackknife</code>, <code>unbiased</code>, or <code>DeLong</code> to estimate reader performance metric covariances.</li>
+</ul>
+</blockquote>
+<p>The function is used similar to <code>mrmc()</code> but without the <code>test</code> and <code>reader</code> arguments. In the following example, an STMC analysis is performed with one of the tests and readers from the <code>VanDyke</code> dataset.</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1"></a><span class="co">## Subset VanDyke dataset by treatment 1 and reader 1</span></span>
+<span id="cb53-2"><a href="#cb53-2"></a>VanDyke11 &lt;-<span class="st"> </span><span class="kw">subset</span>(VanDyke, treatment <span class="op">==</span><span class="st"> &quot;1&quot;</span> <span class="op">&amp;</span><span class="st"> </span>reader <span class="op">==</span><span class="st"> &quot;1&quot;</span>)</span>
+<span id="cb53-3"><a href="#cb53-3"></a></span>
+<span id="cb53-4"><a href="#cb53-4"></a><span class="co">## Estimate ROC AUC for treatment 1 and reader 1</span></span>
+<span id="cb53-5"><a href="#cb53-5"></a>est &lt;-<span class="st"> </span><span class="kw">stmc</span>(<span class="kw">binormal_auc</span>(truth, rating), case, <span class="dt">data =</span> VanDyke11)</span></code></pre></div>
+<details>
+<p><summary><strong>Show STMC ROC Curve</strong></summary></p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a><span class="kw">plot</span>(est)</span></code></pre></div>
+<img src="data:image/png;base64,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" /><!-- -->
+</details>
+<details>
+<p><summary><strong>Show STMC ROC Curve Parameters</strong></summary></p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1"></a><span class="kw">print</span>(<span class="kw">parameters</span>(est))</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 2
+##       a     b
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  1.70 0.537</code></pre>
+</details>
+<details>
+<p><summary><strong>Show STMC ROC AUC Estimate</strong></summary></p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1"></a><span class="kw">summary</span>(est)</span></code></pre></div>
+<pre><code>## binormal_auc       StdErr     CI.Lower     CI.Upper 
+##   0.93316094   0.03348342   0.86753465   0.99878723</code></pre>
+</details>
+<p>
+</div>
+<div id="roc-curves" class="section level1">
+<h1><span class="header-section-number">8</span> ROC Curves</h1>
+<p>ROC curves can be estimated, summarized, and displayed apart from a multi-case statistical analysis with the <code>roc_curves()</code> function. Supported estimation methods include the empirical distribution (default), binormal model, and binormal likelihood-ratio model.</p>
+<div id="curve-fitting" class="section level2">
+<h2><span class="header-section-number">8.1</span> Curve Fitting</h2>
+<blockquote>
+<p><strong>ROC Curves Function</strong></p>
+<p><code>roc_curves(truth, rating, groups = list(), method = &quot;empirical&quot;)</code></p>
+<p><em>Description</em></p>
+<p>Returns an <code>roc_curves</code> class object of estimated ROC curves.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>truth</code>: vector of true binary case statuses, with positive status taken to be the highest level.</li>
+<li><code>rating</code>: numeric vector of case ratings.</li>
+<li><code>groups</code> : list or data frame of grouping variables of the same lengths as <code>truth</code> and <code>rating</code>.</li>
+<li><code>method</code>: character string indicating the curve type as <code>&quot;binormal&quot;</code>, <code>&quot;binormalLR&quot;</code>, <code>&quot;empirical&quot;</code>, or <code>&quot;trapezoidal&quot;</code>.</li>
+</ul>
+</blockquote>
+<p>A single curve can be estimated over all observations or multiple curves estimated within the levels of one or more grouping variables. Examples of both are given in the following sections using variables from the <code>VanDyke</code> dataset referenced inside of calls to the <code>with()</code> function. Alternatively, the variables may be referenced with the <code>$</code> operator; e.g., <code>VanDyke$truth</code> and <code>VanDyke$rating</code>. Resulting curves from <code>roc_curves()</code> can be displayed with the <code>print()</code> and <code>plot()</code> functions.</p>
+<div id="single-curve" class="section level3">
+<h3><span class="header-section-number">8.1.1</span> Single Curve</h3>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1"></a><span class="co">## Direct referencing of data frame columns</span></span>
+<span id="cb59-2"><a href="#cb59-2"></a><span class="co"># curve &lt;- roc_curves(VanDyke$truth, VanDyke$rating)</span></span>
+<span id="cb59-3"><a href="#cb59-3"></a></span>
+<span id="cb59-4"><a href="#cb59-4"></a><span class="co">## Indirect referencing using the with function</span></span>
+<span id="cb59-5"><a href="#cb59-5"></a>curve &lt;-<span class="st"> </span><span class="kw">with</span>(VanDyke, {</span>
+<span id="cb59-6"><a href="#cb59-6"></a>  <span class="kw">roc_curves</span>(truth, rating)</span>
+<span id="cb59-7"><a href="#cb59-7"></a>})</span>
+<span id="cb59-8"><a href="#cb59-8"></a><span class="kw">plot</span>(curve)</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAulBMVEUAAAAAADoAAGYAOpAAZrYzMzM6AAA6ADo6AGY6kNtNTU1NTW5NTY5NbqtNjshmAABmADpmtv9uTU1uTW5uTY5ubqtuq+SOTU2OTW6OTY6OyP+QOgCQtpCQ27aQ29uQ2/+rbk2rbm6rbo6ryKur5P+2ZgC2kDq22/+2///Ijk3I///bkDrbkJDb/7bb/9vb///kq27k///r6+v/tmb/yI7/25D/27b/29v/5Kv//7b//8j//9v//+T///8aKaqjAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAJ30lEQVR4nO2dC3vbNBSG0y10ZBe6DNigBTbYAuvCZWta6M3//28hybItO5I/SUmcuOf7nq3xk6Nj2W+k44t8rElB9Wqy7w04dBEQEAEBERAQAQEREBABAREQEAEBERAQAQEREFA2oItazmJHQcsIXAgIGAgIGAgIGAgIGAgIGAgIGKIAXX/3yXzevnn64kv9QUCVLp8+N4Du350Wn7+pPgio0vmz92ULuv3xk25M9oOA1rrY9fdfitsfPtgP9cVXSn1+o9REy/N1n48FdPnCkLEf1ra/33arLpNaHUMKoLUWNHZAkw4Wn0sKoIcRg1wqW45B9+9el0ex1+M7ivnbyjYB6f9jOw8Kd6H4WqIA9Slv03fosk6FlxoXoS60hVrGDsjBwovVjqHbXgioMXj7EgEZhY9JBFReJe26lo5hLIA8V0k7qMVjGAGgdqciINfiCTgEZC2hYExAfQeqbdYS6XJggGo2+7q+XTMcDqDIWCwSUEoslgYoORZLApQVi4UAsg1n6L3NcBke0Nbu9Q3jsjGgFAXG5Eah3bcgX8CR0IIit8MfjgmosqQOu0gDFDqaE5DR4Vx5ZrgMAChqCDxj04dx2T2gvvNBArrY4ZDeMC47BgRutIsHNNnlpg/jsktA+JJLNqADvD2Y4bI7QJOgZUubPozLrgAN8NzFMC47AtQ+dz6Yvc1w2Q2gQ70Dn+GyC0A9Tx1vc9OHcfEDWk4m8+Xjf/IAJdwXGyugxeO/TuZ3Z1MC8gO6OZmrf8Xq0cccQCmPmRLQLjd9GBcfoGKpu9jNySyCj0xAxUqPz1R86syDz0+1Ts3n82AyiwhArtoZmDpZ7Py0pwUd9EB7hosPkA5AuhmVMaiV/aTzxO5//UBADqBW/pxuSqrL6Y5W+FMyxzpyitTs17JOCynPg9wMTPN5/a3birrUBbUgK7cFXdZ5YnUc6qw0bQB1pIDacmPQ+evqW9mAro5NFytjkJOBWXYs3Yzufwsc5kUAujub3Z3N645WngeZlMyyp6nzoGf1gayzUhGANJrFrFhFXc63VzpkHs4wLiFAy2nWtZgMQMXC0Im7IdReqRBAKggVi8nR2wg+MgGlqLXS/PT0g3XpA/RncgySAWhRXmTcnKQHaRGAlo8+6hi0mkzmXiLSAWk46hTo90ncoEYLUPKjiGMEZE6g1bVG1P1WwYBi+UgF9CTqHIiACIiAkMEDqL7lmnweJAJQqtyVEhABEVDXQEDAsDEgVw910FCLLShg8APKfARPDKDcR/CkAMp+woyACKhU7iN4YgC1H8EjoHVACXJXSkAEZBQZfeQCMk/hRY35SAVUmNHD9LF5SYA0I54HXfS2oCg+MgFF9y+hgNqPARPQegtKkbtSEYDMlSqHfZoltqB+gw9QO5mFgAioz7AOqJvtQ0ChFlSpmQzK5mIGZ4eSAqgtJyWzTPEJz5IpAtDaYb5Jh7JZdMEZ6g7/3ccZLrgFNQl1NhczOEvmQx5Y7dm5JiXT5mIGZ8mU04LKbmaP8u1JMVUcCs6SKQfQYqofJ1+Wh/l2yFGAGINuynHnVTcl0+ZiBmfJlARI37evzqSblEybixk6DxID6O5stjp6qztahJyVigGkMxGmxSL58Rc5gFLkrJSACKjSMuvhBTmAlvr4lf74ixhAuTfMCIiArNjFGKSjXfyAEuSslIAIyCj6wQ6hgPQ12DKekLNSGYDuzub2DwGZpS4gcxJkXr9AQGaJgPoNBAQMBAQMHkBpefOOhA4cAjnUZbQgAmobCAgYCAgYCAgYCAgY/IDy8ublAMrMmxcDKDctnIAIyCozb14OoMy8eUGAEuSslIAIqFRuvpgYQBbTy9S0cGGA0qeNEAeIXeyiF1DcU5zOSsUAskE6+dUUYgAlyVmpGEAJA88yAQVTMq9fmbn7QrNkigFUtO6VNRmYOgdK54yFZskUAyiUknmpMZ2fBmfJFAOorXb+nFoKzpIpY2R17dUvrQxMnSsWnCVTRgtaA+S2oNs31SyQvkkghQJyMjCvX9XhmYBqNRmYlk9wlkwpgLqPv9Qpmc5s4d5ZMqUASjiNJiACIiBgICBgWAOUKmelBERABLRmICBgICBgICBgICBg2CKgIJ/D2dsMFwICBgICBgICBgICBgICBgICBgICho0BNXrQ44ZsQSEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQEDAQFDBKAmJdMuBWaHkgqoScm0S6FZMqUCatKh7FJohjqpgJqEOrsUnCXzQStmlky7FJwlc+DfdhgXDKinBRGQVnQMGsHeZrhgQE1Kpl0KzpI58KYP44IBObNk9p8HjWBvM1wiAPVrf5s+jAsBAQMBAQMBAcPGgBplnFSPyIWAgAsBARcCAi4P+yHnLYiAgAgIiICACAgoF1D/kAdw8b24ErjYsgm1OK+FArUU9W0uz75kAgJDHv0u3hdX9rvYsim1aOm7xLAWVcwS9O1LJiBwu7Hfxfviyn4XWzallqL8JXAtxfmz96WHb18yAYEb1v0udtubF1diF1s2sRbdDHAtRd3FfPuSCQgMefS7FL4XV/a72LJptZhPXEtRA/Lty35akOfFlcjFlE2r5bKOtCgObb8FbRSDvC+uBC5l2bQYdF79CrGAthiDwJBHv4v3xZX9LrZsSi22Y+FaihqQb182Ow8KDXn0u3hfXAlqsWUTaql6Ca6lBBTYF55JAxEQEAEBERAQAQERENBwgO7OyrdV16+MvXrinSPHlvNMoKMd/v0j4Fet3p2AUBXeWEMC6kyeGARkyi29c1QFfBq3q+N5ROEEHSwg/9uJIaBiMY0onKB9ALo6Nl1Bb79ZnJcdxDYZB5D+dlo5zJXDT2phdvXkF1NEtbF1NwOorED/nblrztIeAJm2ofZOATK/seoVZvpkO3GOLbfQuz8t9P+qlHVQ/3VRVc7jtlIgnQoKt0iWBg/Ss+I/vbXlzl59Xf62ZlI826lsOfWN+Vb9qUo1gOyHx003R6eC1pqztJcYtDJHKb39i7IPLZ0jUFPOTLbolGrI6DKqWay5XR3POhUs149tadpLFzuqm4GZruLRR7cPeADZUg0gZfq7ZNRx0z2sVcEmvctoD4DMfq+O3lYHGdUBVs5ZjwNIf1tNSalKOYBuXv6k+p3HbaG7plPBKm5CwrD2AUj/vsdm+83emy6j9snuSwOoCtJVKfVPRxMDdqE7ncft6nhaV1AeCJsiWdpHDFIh5ehn0yBssChDrN0LJ1ZVh3lbqgxHUwPI9CWf21LFG1uBoegUyRKvxYAICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgIAICIiAgAgI6H94muI+jEp/3QAAAABJRU5ErkJggg==" /><!-- --></p>
+</div>
+<div id="multiple-curves" class="section level3">
+<h3><span class="header-section-number">8.1.2</span> Multiple Curves</h3>
+<p>Multiple group-specific curves can be obtained from <code>roc_curves()</code> by supplying a list or data frame of grouping variables to the <code>groups</code> argument. Groups will be formed and displayed in the order in which grouping variables are supplied. For instance, a second grouping variable will be plotted within the first one.</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a><span class="co">## Grouped by reader</span></span>
+<span id="cb60-2"><a href="#cb60-2"></a>curves &lt;-<span class="st"> </span><span class="kw">with</span>(VanDyke, {</span>
+<span id="cb60-3"><a href="#cb60-3"></a>  <span class="kw">roc_curves</span>(truth, rating,</span>
+<span id="cb60-4"><a href="#cb60-4"></a>             <span class="dt">groups =</span> <span class="kw">list</span>(<span class="dt">Reader =</span> reader, <span class="dt">Treatment =</span> treatment))</span>
+<span id="cb60-5"><a href="#cb60-5"></a>})</span>
+<span id="cb60-6"><a href="#cb60-6"></a><span class="kw">plot</span>(curves)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1"></a><span class="co">## Grouped by treatment</span></span>
+<span id="cb61-2"><a href="#cb61-2"></a>curves &lt;-<span class="st"> </span><span class="kw">with</span>(VanDyke, {</span>
+<span id="cb61-3"><a href="#cb61-3"></a>  <span class="kw">roc_curves</span>(truth, rating,</span>
+<span id="cb61-4"><a href="#cb61-4"></a>             <span class="dt">groups =</span> <span class="kw">list</span>(<span class="dt">Treatment =</span> treatment, <span class="dt">Reader =</span> reader))</span>
+<span id="cb61-5"><a href="#cb61-5"></a>})</span>
+<span id="cb61-6"><a href="#cb61-6"></a><span class="kw">plot</span>(curves)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="parametric-curves" class="section level3">
+<h3><span class="header-section-number">8.1.3</span> Parametric Curves</h3>
+<p>Estimated parameters for curves obtained with the binormal or binormal likelihood-ratio models can be extracted as a data frame with the <code>parameters()</code> function.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1"></a><span class="co">## Binormal curves</span></span>
+<span id="cb62-2"><a href="#cb62-2"></a>curves_binorm &lt;-<span class="st"> </span><span class="kw">with</span>(VanDyke, {</span>
+<span id="cb62-3"><a href="#cb62-3"></a>  <span class="kw">roc_curves</span>(truth, rating,</span>
+<span id="cb62-4"><a href="#cb62-4"></a>             <span class="dt">groups =</span> <span class="kw">list</span>(<span class="dt">Treatment =</span> treatment, <span class="dt">Reader =</span> reader),</span>
+<span id="cb62-5"><a href="#cb62-5"></a>             <span class="dt">method =</span> <span class="st">&quot;binormal&quot;</span>)</span>
+<span id="cb62-6"><a href="#cb62-6"></a>})</span></code></pre></div>
+<pre><code>## Warning in binormal_params(data$truth, data$rating, ...): 
+## Binormal curve fit has AUC = 1 due to lack of interior points.
+## Consider fitting an empirical curve instead.</code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1"></a>params_binorm &lt;-<span class="st"> </span><span class="kw">parameters</span>(curves_binorm)</span>
+<span id="cb64-2"><a href="#cb64-2"></a><span class="kw">print</span>(params_binorm)</span></code></pre></div>
+<pre><code>## # A tibble: 10 × 3
+##    Group$Treatment $Reader      a     b
+##    &lt;fct&gt;           &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;
+##  1 1               1         1.70 0.537
+##  2 2               1         1.85 0.503
+##  3 1               2         1.40 0.561
+##  4 2               2         1.66 0.447
+##  5 1               3         1.74 0.635
+##  6 2               3         1.62 0.488
+##  7 1               4         1.93 0.202
+##  8 2               4       Inf    1    
+##  9 1               5         1.06 0.464
+## 10 2               5         1.73 0.422</code></pre>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1"></a><span class="kw">plot</span>(curves_binorm)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Estimates for different parameterizations of the binormal likelihood-ratio model are additionally returned and include those of the binormal model and the simplification of Pan and Metz <span class="citation">(1997; Metz and Pan 1999)</span> as well as those of the bi-chi-squared model <span class="citation">(Hillis 2017)</span>.</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1"></a><span class="co">## Binormal likelihood-ratio curves</span></span>
+<span id="cb67-2"><a href="#cb67-2"></a>curves_binormLR &lt;-<span class="st"> </span><span class="kw">with</span>(VanDyke, {</span>
+<span id="cb67-3"><a href="#cb67-3"></a>  <span class="kw">roc_curves</span>(truth, rating,</span>
+<span id="cb67-4"><a href="#cb67-4"></a>             <span class="dt">groups =</span> <span class="kw">list</span>(<span class="dt">Treatment =</span> treatment, <span class="dt">Reader =</span> reader),</span>
+<span id="cb67-5"><a href="#cb67-5"></a>             <span class="dt">method =</span> <span class="st">&quot;binormalLR&quot;</span>)</span>
+<span id="cb67-6"><a href="#cb67-6"></a>})</span></code></pre></div>
+<pre><code>## Warning in binormalLR_params(data$truth, data$rating, ...): 
+## Likelihood ratio binormal curve fit has AUC = 1 due to lack of interior points.
+## Consider fitting an empirical curve instead.</code></pre>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1"></a>params_binormLR &lt;-<span class="st"> </span><span class="kw">parameters</span>(curves_binormLR)</span>
+<span id="cb69-2"><a href="#cb69-2"></a><span class="kw">print</span>(params_binormLR)</span></code></pre></div>
+<pre><code>## # A tibble: 10 × 4
+##    Group$Treatment $Reader   Metz$d_a     $c bichisquared…¹     $theta binorma…²
+##    &lt;fct&gt;           &lt;fct&gt;        &lt;dbl&gt;  &lt;dbl&gt;          &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+##  1 1               1         2.13     -0.298           3.42   1.71e+ 0   1.71e+0
+##  2 2               1         2.35     -0.321           3.79   1.70e+ 0   1.87e+0
+##  3 1               2         1.73     -0.281           3.17   1.32e+ 0   1.40e+0
+##  4 2               2         0.00700  -0.791          73.3    3.48e- 7   4.99e-3
+##  5 1               3         0.0140   -0.746          47.0    2.22e- 6   9.99e-3
+##  6 2               3         2.08     -0.330           3.94   1.23e+ 0   1.65e+0
+##  7 1               4         0.000417 -0.932         797.     1.09e-10   2.95e-4
+##  8 2               4       Inf         0               1    Inf        Inf      
+##  9 1               5         0.895    -0.508           9.37   5.94e- 2   6.66e-1
+## 10 2               5         2.02     -0.553          12.1    2.18e- 1   1.49e+0
+## # … with 1 more variable: binormal$b &lt;dbl&gt;, and abbreviated variable names
+## #   ¹​bichisquared$lambda, ²​binormal$a</code></pre>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1"></a><span class="kw">plot</span>(curves_binormLR)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+</div>
+<div id="curve-points" class="section level2">
+<h2><span class="header-section-number">8.2</span> Curve Points</h2>
+<p>Points on an ROC curve estimated with <code>roc_curves()</code> can be extracted with the <code>points()</code> function. True positive rates (TPRs) and false positive rates (FPRs) on the estimated curve are returned for a given set of sensitivity or specificity values or, in the case of empirical curves, the original points. ROC curve points can be displayed with <code>print()</code> and <code>plot()</code>.</p>
+<blockquote>
+<p><strong>ROC Points Function</strong></p>
+<p><code>## Method for class &#39;roc_curves&#39;</code><br />
+<code>points(x, metric = &quot;specificity&quot;, values = seq(0, 1, length = 101), ...)</code></p>
+<p><code>## Method for class &#39;empirical_curves&#39;</code><br />
+<code>points(x, metric = &quot;specificity&quot;, values = NULL, which = &quot;curve&quot;, ...)</code></p>
+<p><em>Description</em></p>
+<p>Returns an <code>roc_points</code> class object that is a data frame of false positive and true positive rates from an estimated ROC curve.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>x</code>: object from <code>roc_curves()</code> for which to compute points on the curves.</li>
+<li><code>metric</code>: character string specifying <code>&quot;specificity&quot;</code> or <code>&quot;sensitivity&quot;</code> as the reader performance metric to which <code>values</code> correspond.</li>
+<li><code>values</code>: numeric vector of values at which to compute ROC curve points, or <code>NULL</code> for default empirical values as determined by <code>which</code>.</li>
+<li><code>which</code>: character string indicating whether to use curve-specific observed values and 0 and 1 (<code>&quot;curve&quot;</code>), the combination of these values over all curves (<code>&quot;curves&quot;</code>), or only the observed curve-specific values (<code>&quot;observed&quot;</code>).</li>
+</ul>
+</blockquote>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1"></a><span class="co">## Extract points at given specificities</span></span>
+<span id="cb72-2"><a href="#cb72-2"></a>curve_spec_pts &lt;-<span class="st"> </span><span class="kw">points</span>(curves, <span class="dt">metric =</span> <span class="st">&quot;spec&quot;</span>, <span class="dt">values =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.7</span>, <span class="fl">0.9</span>))</span>
+<span id="cb72-3"><a href="#cb72-3"></a><span class="kw">print</span>(curve_spec_pts)</span></code></pre></div>
+<pre><code>## # A tibble: 30 × 3
+##    Group$Treatment $Reader   FPR   TPR
+##  * &lt;fct&gt;           &lt;fct&gt;   &lt;dbl&gt; &lt;dbl&gt;
+##  1 1               1         0.1 0.862
+##  2 1               1         0.3 0.908
+##  3 1               1         0.5 0.935
+##  4 2               1         0.1 0.843
+##  5 2               1         0.3 0.966
+##  6 2               1         0.5 0.978
+##  7 1               2         0.1 0.747
+##  8 1               2         0.3 0.821
+##  9 1               2         0.5 0.872
+## 10 2               2         0.1 0.821
+## # … with 20 more rows</code></pre>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1"></a><span class="kw">plot</span>(curve_spec_pts, <span class="dt">coord_fixed =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1"></a><span class="co">## Extract points at given sensitivities</span></span>
+<span id="cb75-2"><a href="#cb75-2"></a>curve_sens_pts &lt;-<span class="st"> </span><span class="kw">points</span>(curves, <span class="dt">metric =</span> <span class="st">&quot;sens&quot;</span>, <span class="dt">values =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.7</span>, <span class="fl">0.9</span>))</span>
+<span id="cb75-3"><a href="#cb75-3"></a><span class="kw">print</span>(curve_sens_pts)</span></code></pre></div>
+<pre><code>## # A tibble: 30 × 3
+##    Group$Treatment $Reader    FPR   TPR
+##  * &lt;fct&gt;           &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;
+##  1 1               1       0.0116   0.5
+##  2 1               1       0.0246   0.7
+##  3 1               1       0.254    0.9
+##  4 2               1       0        0.5
+##  5 2               1       0        0.7
+##  6 2               1       0.337    0.9
+##  7 1               2       0.0130   0.5
+##  8 1               2       0.0543   0.7
+##  9 1               2       0.609    0.9
+## 10 2               2       0        0.5
+## # … with 20 more rows</code></pre>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1"></a><span class="kw">plot</span>(curve_sens_pts, <span class="dt">coord_fixed =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="mean-curves" class="section level2">
+<h2><span class="header-section-number">8.3</span> Mean Curves</h2>
+<p>A mean ROC curve from multiple group-specific curves returned by <code>roc_curves()</code> can be computed with the <code>means()</code> function. Curves can be averaged over sensitivities, specificities, or binormal parameters <span class="citation">(Chen and Samuelson 2014)</span>. Averaged curves can be displayed with <code>print()</code> and <code>plot()</code>.</p>
+<blockquote>
+<p><strong>ROC Means Function</strong></p>
+<p><code>## Method for class &#39;roc_curves&#39;</code><br />
+<code>mean(x, ...)</code></p>
+<p><code>## Method for class &#39;binormal_curves&#39;</code><br />
+<code>mean(x, method = &quot;points&quot;, ...)</code></p>
+<p><em>Description</em></p>
+<p>Returns an <code>roc_points</code> class object.</p>
+<p><em>Arguments</em></p>
+<ul>
+<li><code>x</code>: object from <code>roc_curves()</code> for which to average over the curves.</li>
+<li><code>method</code>: character string indicating whether to average binormal curves over <code>&quot;points&quot;</code> or <code>&quot;parameters&quot;</code>.</li>
+<li><code>...</code>: optional arguments passed to <code>points()</code>, including at which <code>metric</code> (<code>&quot;sensitivity&quot;</code> or <code>&quot;specificity&quot;</code>) values to average points on the ROC curves.</li>
+</ul>
+</blockquote>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1"></a><span class="co">## Average sensitivities at given specificities (default)</span></span>
+<span id="cb78-2"><a href="#cb78-2"></a>curves_mean &lt;-<span class="st"> </span><span class="kw">mean</span>(curves)</span>
+<span id="cb78-3"><a href="#cb78-3"></a><span class="kw">print</span>(curves_mean)</span></code></pre></div>
+<pre><code>## # A tibble: 20 × 2
+##       FPR   TPR
+##  *  &lt;dbl&gt; &lt;dbl&gt;
+##  1 0      0    
+##  2 0      0.402
+##  3 0.0145 0.686
+##  4 0.0290 0.762
+##  5 0.0435 0.790
+##  6 0.0580 0.802
+##  7 0.0725 0.813
+##  8 0.101  0.835
+##  9 0.116  0.844
+## 10 0.130  0.852
+## 11 0.159  0.862
+## 12 0.188  0.872
+## 13 0.319  0.904
+## 14 0.362  0.912
+## 15 0.435  0.925
+## 16 0.638  0.956
+## 17 0.667  0.961
+## 18 0.696  0.966
+## 19 0.913  0.992
+## 20 1      1</code></pre>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1"></a><span class="kw">plot</span>(curves_mean)</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAulBMVEUAAAAAADoAAGYAOpAAZrYzMzM6AAA6ADo6AGY6kNtNTU1NTW5NTY5NbqtNjshmAABmADpmtv9uTU1uTW5uTY5ubqtuq+SOTU2OTW6OTY6OyP+QOgCQtpCQ27aQ29uQ2/+rbk2rbm6rbo6ryKur5P+2ZgC2kDq22/+2///Ijk3I///bkDrbkJDb/7bb/9vb///kq27k///r6+v/tmb/yI7/25D/27b/29v/5Kv//7b//8j//9v//+T///8aKaqjAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAJzklEQVR4nO2dC3ubNhSGndZL516WutvaLdnWbq23puzSxvGWG///b003kACJI8k2YJ/ve9qYx0cHodeSEIiDZiXUq9nYBzB1ARAhACIEQIQAiBAAEQIgQgBECIAIARAhACIEQISyAV3VcjZbCloOwAWACAMAEQYAIgwARBgAiDAAEGGIAnTz3Sf1effm6Ysv9QcAVbp++lwBenh3Xn7+pvoAoEqXz97rGnT34ydZmcwHAHWa2M33X8q7Hz6YD/HFV0J9foepmZDn2z4XA+j6hSJjPoxtvN92xy6zSk1DCqBODToGQA0uHpcUQMfUB/m5eFxSAD28e63PYq8P9izW4rLLTlr+P9xxUKC+sB9JEw2JL6DIhsQRkK/CAJBSuC1xB1Q1pxEvNSYKqNUBA5A15J6zMw7swAD1nbV5A6rJDN2Qpw+oVWcAyLEk9TTMAO1nUJPhMkFAis3417fV1rQA1fUGgDqGyL6YJ6CEC0x+gPy9MQBJRd0UjjUcG6D+C/AjApQj/9TctDVYDRr1uiHDZVhA4fm5jEMfxmVAQJ4OGYBqi/90BUDGknwy5wUoOG8HQEr7mm8YxmXvgHpvkwLQ1Sxo2frQh3HZL6Cp3dzJcNkroFnQsotDH8Zlj4D2Pec5jMv+AM2Clh0d+jAu+wLUGPtMprQZLnsCFHlNyhbQVG8wZ7jsBdAwz10M4+IHVMxmy+LxP5mA4u9qHCqg1eO/zpb3F/M8QN1L08mUNsPFB+j2bCn+letHHwFoD4CmPMmV4eIDVBayid2eLSL48ARUruXcQ8Wnjjz4/FTqXH0+DwWzJN1ZPVhArpoRmDJY7PK8pwZxACQ7IFmNdB/UiH6ScWIPv34AIAdQI35OViXR5GRDK/0hmQc3ZRopW66iDpHR4yA3AlN93nzr1qIW9bTH5g67Bhm5Nei6jhOr+6HWTlkAasrtgy5fV9/yBrQ5VU1M90FOBKZuWLIaPfwWOM2zAHR/sbi/WNYNTY+DVEimbmliHPSsPpG1dsoCkESzWpTrqMv55k6HjKIYxiUEqJhnXYvxAFSuFJ24G0LNnTIBJDqhcjU7eRvBhyegFDV3ygvQn8l90NSf6c1w8QBa6YuM27P0TpoFoOLRR9kHrWezpZcId0ASjhgC/T6Lm9TgB0gNoMW1RtT9VsaAYvlwBfQkagwEQAAEQJTBA6i+5Ypx0NWuLzUACIC2ArTFq8Im6wJAhGFrQK6OddJQCjUoYPADynwEjw2g3EfwuADKfsIMgABIK/cRPDaAmo/gAVAXUILcnQIQAClF9j58Aamn8KLmfLgCKtXsYfrcPCdAkhHGQVe9NSiKD09A0e2LKaDmY8AA1K1BKXJ2mv6Sl0MEpK5U86Z9eABCDWoafICawSwABEB9hi6gdrQPAIVqUCW7GJSJxQytDsUGUFNOSKYO8QmukskDUOc0b8OhTBRdcIU6HoA6sgF1JhYzuErmMU+s9hTOhmSaWMzgKpl8apBuZuYs31wUU/RDwVUy+QBazeXj5IU+zTe7HAEIfdCtnndet0MyTSxmcJVMToDkfftqJG1DMk0sJvtx0P3FYn3yVja0CDk7ZQNIRiLMy1Xy4y98AKXI2SkAAVClIuvhBT6ACnn+Sn78JchnOqXNcPEByrxhBkAAVAlNbC+dNCdACbI7BSAA0op+sIMpIHkNVsQTsjtlAuj+Ymn+AJDaagNSgyD1+gUAUlsA1G8AIMIAQITBAygtbt7qqOcNMVAMGQCIMAAQYQAgwgBAhAGACIMfUFbcPCNAeXHzfABlhoUDEABVyoubZwQoL26eE6AE2Z0CEAAZZcaL8QFkML1MDAvnBih52Qh+gNDErnoBxT3FaXfKB5DppFNfTcEHUJLsTvkASph45gkoGJJ580qt3RdYJZMPoLJxr8xGYMoYKBkzFlglkw+gUEjmtcR0eR5aJZMPoKaa8XNiK7RKJpOZ1c6rXxoRmDJWLLRKJpMa1AHk1qC7N9UqkJ5FILkCciIwb17V3TMA1bIRmIZPaJVMNoDaj7/UIZnOauG+VTLZAEoYRgMQAAEQYQAgwtABlCq7UwACIADqGgCIMAAQYQAgwgBAhAGACAMAEQYAIgwARBgAiDAAEGEAIMIAQIRha0BWTCYOU2WpowYBEAB1DQBEGACIMAAQYQAgwgBAhAGACAMAEQYAIgwARBgAiDAAEGEAIMIAQIQBgAgDABEGACIMAEQYAIgwABBhiABkQzLNVmB1KK6AbEim2QqtkskVkA2HMluhFeq4ArIBdWYruErmUStmlUyzFVwlc+DfdhgXGlBPDQIgqeg+6ABKm+FCA7IhmWYruErmwIc+jAsNyFkls38cdAClzXCJANSv8Q59GBcAIgwARBgAiDBsDcgqY1B9QC4ARLgAEOECQITLcT/kvAMBECEAIgRAhACIUC6g/ikPwsX34krCxaRNyMV5LRSRS1nf5vKUJRMQMeXR7+J9cWW/i0mbkouUvEtM5iKSGYK+smQCIm439rt4X1zZ72LSpuRS6l+CzqW8fPZee/jKkgmIuGHd72KO3b64knYxaRNzkdWAzqWsm5ivLJmAiCmPfpfS9+LKfheTNi0X9UnnUtaAfGUZpwZ5XlxJuai0ablc1z0t1Q/tvgZt1Qd5X1xJuOi0aX3QZfUrxALaYR9ETHn0u3hfXNnvYtKm5GIaFp1LWQPylWW7cVBoyqPfxfviSiIXkzYhl6qV0LloQIGyYCRNCIAIARAhACIEQIQAiNBwgO4v9Nuq61fGbp5418gx6TwL6EiHf/8I+FW7dxcgFIm31pCAWosnBgGpdIV3jaqAj3XbnC4jEidosoD8bycmAZWreUTiBI0BaHOqmoI8frW51A3EVBkHkPx2XjkshcNPYmOxefKLSiLqWNdNAdIZyL8Ld89ZGgGQqhuidAKQ+o1Fq1DLJ5uFc0y6lSz+vJT/q1TGQfyXSUU6j9tagHQyKN0kWRq8k16U/8mj1YXdfK1/W7UonmlUJp34Rn0r/lSpLCDz4XGT1dHJoLHnLI3SB63VWUoe/0q3ocI5A9l0arFFJ5UlI9OIatFx25wuWhkU3XNbmkZpYid1NVDLVTz66LYBDyCTygISpr81o5abbGGNDLZpXUojAFLlXp+8rU4yogGsnVGPA0h+Wy1JKVI5gG5f/iTancdtJZumk8E6bkHCsMYAJH/fU3X8qvSqyYgymbJYQFUnXaUS/2RvosCuZKPzuG1O53UG+kRok2RpjD5IdCknP6sKYToL3cWaUjh9VXWaN6l0dzRXgFRb8rkVor8xGSiKTpIs4VqMEAARAiBCAEQIgAgBECEAIgRAhACIEAARAiBCAEQIgAgBECEAIgRAhP4HR5vgKUz1vkUAAAAASUVORK5CYII=" /><!-- --></p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1"></a><span class="co">## Average specificities at given sensitivities</span></span>
+<span id="cb81-2"><a href="#cb81-2"></a>curves_mean &lt;-<span class="st"> </span><span class="kw">mean</span>(curves, <span class="dt">metric =</span> <span class="st">&quot;sens&quot;</span>)</span>
+<span id="cb81-3"><a href="#cb81-3"></a><span class="kw">print</span>(curves_mean)</span></code></pre></div>
+<pre><code>## # A tibble: 23 × 2
+##        FPR   TPR
+##  *   &lt;dbl&gt; &lt;dbl&gt;
+##  1 0       0    
+##  2 0.00698 0.511
+##  3 0.00804 0.556
+##  4 0.00899 0.578
+##  5 0.00995 0.6  
+##  6 0.0109  0.622
+##  7 0.0214  0.667
+##  8 0.0280  0.689
+##  9 0.0358  0.711
+## 10 0.0450  0.733
+## # … with 13 more rows</code></pre>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1"></a><span class="kw">plot</span>(curves_mean)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+</div>
+<div id="reader-performance-metrics" class="section level1">
+<h1><span class="header-section-number">9</span> Reader Performance Metrics</h1>
+<p>The reader performance metrics described previously for use with <code>mrmc()</code> and related functions to analyze multi and single-reader multi-case studies can be applied to truth and rating vectors as stand-alone functions. This enables estimation of performance metrics for other applications, such as predictive modeling, that may be of interest.</p>
+<div id="roc-curve-metrics" class="section level2">
+<h2><span class="header-section-number">9.1</span> ROC Curve Metrics</h2>
+<p>AUC, partial AUC, sensitivity, and specificity are estimated below with an empirical ROC curve. Estimates with binormal and binormal likelihood-ratio curves can be obtained by replacing <code>empirical</code> in the function names with <code>binormal</code> and <code>binormalLR</code>, respectively.</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1"></a><span class="co">## Total area under the empirical ROC curve</span></span>
+<span id="cb84-2"><a href="#cb84-2"></a><span class="kw">empirical_auc</span>(VanDyke<span class="op">$</span>truth, VanDyke<span class="op">$</span>rating)</span></code></pre></div>
+<pre><code>## [1] 0.9229791</code></pre>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1"></a><span class="co">## Partial area for specificity from 0.7 to 1.0</span></span>
+<span id="cb86-2"><a href="#cb86-2"></a><span class="kw">empirical_auc</span>(VanDyke<span class="op">$</span>truth, VanDyke<span class="op">$</span>rating, <span class="dt">partial =</span> <span class="st">&quot;spec&quot;</span>, <span class="dt">min =</span> <span class="fl">0.70</span>, <span class="dt">max =</span> <span class="fl">1.0</span>)</span></code></pre></div>
+<pre><code>## [1] 0.2499923</code></pre>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1"></a><span class="co">## Partial area for sensitivity from 0.7 to 1.0</span></span>
+<span id="cb88-2"><a href="#cb88-2"></a><span class="kw">empirical_auc</span>(VanDyke<span class="op">$</span>truth, VanDyke<span class="op">$</span>rating, <span class="dt">partial =</span> <span class="st">&quot;sens&quot;</span>, <span class="dt">min =</span> <span class="fl">0.70</span>, <span class="dt">max =</span> <span class="fl">1.0</span>)</span></code></pre></div>
+<pre><code>## [1] 0.2262129</code></pre>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1"></a><span class="co">## Sensitivity for given specificity</span></span>
+<span id="cb90-2"><a href="#cb90-2"></a><span class="kw">empirical_sens</span>(VanDyke<span class="op">$</span>truth, VanDyke<span class="op">$</span>rating, <span class="dt">spec =</span> <span class="fl">0.8</span>)</span></code></pre></div>
+<pre><code>## [1] 0.8812346</code></pre>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1"></a><span class="co">## Sensitivity for given specificity</span></span>
+<span id="cb92-2"><a href="#cb92-2"></a><span class="kw">empirical_spec</span>(VanDyke<span class="op">$</span>truth, VanDyke<span class="op">$</span>rating, <span class="dt">sens =</span> <span class="fl">0.8</span>)</span></code></pre></div>
+<pre><code>## [1] 0.94434</code></pre>
+</div>
+<div id="binary-metrics-1" class="section level2">
+<h2><span class="header-section-number">9.2</span> Binary Metrics</h2>
+<p>Sensitivity and specificity for binary ratings are available with the <code>binary_sens()</code> and <code>binary_spec()</code> functions as demonstrated in the next example based on a binary rating created from the numeric one in the <code>VanDyke</code> dataset.</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1"></a><span class="co">## Create binary classification</span></span>
+<span id="cb94-2"><a href="#cb94-2"></a>VanDyke<span class="op">$</span>binary_rating &lt;-<span class="st"> </span>VanDyke<span class="op">$</span>rating <span class="op">&gt;=</span><span class="st"> </span><span class="dv">3</span></span>
+<span id="cb94-3"><a href="#cb94-3"></a></span>
+<span id="cb94-4"><a href="#cb94-4"></a><span class="co">## Sensitivity</span></span>
+<span id="cb94-5"><a href="#cb94-5"></a><span class="kw">binary_sens</span>(VanDyke<span class="op">$</span>truth, VanDyke<span class="op">$</span>binary_rating)</span></code></pre></div>
+<pre><code>## [1] 0.8711111</code></pre>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1"></a><span class="co">## Specificity</span></span>
+<span id="cb96-2"><a href="#cb96-2"></a><span class="kw">binary_spec</span>(VanDyke<span class="op">$</span>truth, VanDyke<span class="op">$</span>binary_rating)</span></code></pre></div>
+<pre><code>## [1] 0.8478261</code></pre>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-Abbey:2013:SPC">
+<p>Abbey, Craig K, Frank W Samuelson, and Brandon D Gallas. 2013. “Statistical Power Considerations for a Utility Endpoint in Observer Performance Studies.” <em>Academic Radiology</em> 207: 798–806.</p>
+</div>
+<div id="ref-Chen:2014:ARO">
+<p>Chen, W, and Frank W Samuelson. 2014. “The Average Receiver Operating Characteristic Curve in Multireader Multicase Imaging Studies.” <em>The British Journal of Radiology</em> 87 (1040): 20140016.</p>
+</div>
+<div id="ref-DeLong:1988:CAU">
+<p>DeLong, E R, D M DeLong, and D L Clarke-Pearson. 1988. “Comparing the Areas Under Two or More Correlated Receiver Operating Characteristic Curves: A Nonparametric Approach.” <em>Biometrics</em> 44 (3): 837–45.</p>
+</div>
+<div id="ref-Dorfman:1992:ROC">
+<p>Dorfman, D D, K S Berbaum, and C E Metz. 1992. “Receiver Operating Characteristic Rating Analysis. Generalization to the Population of Readers and Patients with the Jackknife Method.” <em>Investigative Radiology</em> 27 (9): 723–31.</p>
+</div>
+<div id="ref-Efron:1982:JBR">
+<p>Efron, Bradley. 1982. <em>The Jackknife, the Bootstrap and Other Resampling Plans</em>. Philadelphia: SIAM.</p>
+</div>
+<div id="ref-Gallas:2007:MMV">
+<p>Gallas, B D, G A Pennello, and K J Meyers. 2007. “Multireader Multicase Variance Analysis for Binary Data.” <em>Journal of the Optical Society of America A</em> 24 (12): B70–B80.</p>
+</div>
+<div id="ref-Hillis:2007:CDD">
+<p>Hillis, S L. 2007. “A Comparison of Denominator Degrees of Freedom Methods for Multiple Observer ROC Analysis.” <em>Statistics in Medicine</em> 26 (3): 596–619.</p>
+</div>
+<div id="ref-Hillis:2014:MMA">
+<p>———. 2014. “A Marginal-Mean ANOVA Approach for Analyzing Mulitreader Multicase Radiological Imaging Data.” <em>Statistics in Medicine</em> 33 (2): 330–60.</p>
+</div>
+<div id="ref-Hillis:2017:EBL">
+<p>———. 2017. “Equivalence of Binormal Likelihood-Ratio and Bi-Chi-Squared Roc Curve Models.” <em>Statistics in Medicine</em> 35 (12): 2031–57.</p>
+</div>
+<div id="ref-Hillis:2018:RRM">
+<p>———. 2018. “Relationship Between Roe and Metz Simulation Model for Multireader Diagnostic Data and Obuchowski-Rockette Model Parameters.” <em>Statistics in Medicine</em> 37: 2067–93.</p>
+</div>
+<div id="ref-Hillis:2008:RDD">
+<p>Hillis, S L, K S Berbaum, and C E Metz. 2008. “Recent Developments in the Dorfman-Berbaum-Metz Procedure for Multireader ROC Study Analysis.” <em>Academic Radiology</em> 15: 647–61.</p>
+</div>
+<div id="ref-Hillis:2005:CDB">
+<p>Hillis, S L, N A Obuchowski, K M Schartz, and K S Berbaum. 2005. “A Comparison of the Dorfman-Berbaum-Metz and Obuchowski-Rockette Methods for Receiver Operating Characteristic (ROC) Data.” <em>Statistics in Medicine</em> 24: 1579–1607.</p>
+</div>
+<div id="ref-Metz:1993:PBR">
+<p>Metz, Charles E, and Xiaochuan Pan. 1999. “&quot;Proper&quot; Binormal ROC Curves: Theory and Maximum-Likelihood Estimation.” <em>Journal of Mathematical Psychology</em> 43 (1): 1–33.</p>
+</div>
+<div id="ref-Obuchowski:1995:HTD">
+<p>Obuchowski, N A, and H E Rockette. 1995. “Hypothesis Testing of Diagnostic Accuracy for Multiple Readers and Multiple Tests: An ANOVA Approach with Dependent Observations.” <em>Communications in Statistics–Simulation and Computation</em> 24 (2): 285–308.</p>
+</div>
+<div id="ref-Pan:1997:PBM">
+<p>Pan, Xiaochuan, and Charles E Metz. 1997. “The &quot;Proper&quot; Binormal Model: Parametric Receiver Operating Characteristic Curve Estimation with Degenerate Data.” <em>Statistics in Radiology</em> 4 (5): 380–89.</p>
+</div>
+<div id="ref-MRMCaov-package">
+<p>Smith, Brian J, Stephen L Hillis, and Lorenzo L Pesce. 2022. <em>MCMCaov: Multi-Reader Multi-Case Analysis of Variance</em>. <a href="https://github.com/brian-j-smith/MRMCaov">https://github.com/brian-j-smith/MRMCaov</a>.</p>
+</div>
+<div id="ref-VanDyke:1993:CMD">
+<p>VanDyke, C W, R D White, N A Obuchowski, M A Geisinger, R J Lorig, and M A Meziane. 1993. “Cine MRI in the Diagnosis of Thoracic Aortic Dissection.” Chicago, IL.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
