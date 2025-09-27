@@ -98,7 +98,7 @@ roc_curves.default <- function(
       roc_curve(split, ...)
     }, simplify = FALSE)
     groups <- expand.grid(dimnames(curves))
-    keep <- !is.null(curves)
+    keep <- !sapply(curves, is.null)
     curves <- tibble(Group = groups[keep, , drop = FALSE], Curve = curves[keep])
     new_roc_curves(curves, method = method)
   } else {

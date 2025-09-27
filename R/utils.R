@@ -139,12 +139,12 @@ is_one_reader <- function(x, ...) {
 }
 
 
-is_one_reader.mrmc <- function(x) {
+is_one_reader.mrmc <- function(x, ...) {
   dim(x)["reader"] == 1
 }
 
 
-is_one_reader.vcov_comps <- function(x) {
+is_one_reader.vcov_comps <- function(x, ...) {
   x$n["reader"] == 1
 }
 

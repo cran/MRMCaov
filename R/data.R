@@ -48,6 +48,32 @@
 
 #' Multi-reader multi-case dataset
 #'
+#' Data from a multi-reader multi-case study conducted by Soh et al. (2021)
+#' to examine the effect that a test set from 1 region of the world has on the
+#' performance of expert breast radiologists from that region and from a distant
+#' region.  In the study, readers are nested within countries.
+#'
+#' @format A data frame with 4073 rows and 5 variables:
+#' \describe{
+#'   \item{reader}{reader identifier by country}
+#'   \item{country}{country identifier (AU = Australia, SG = Singapore)}
+#'   \item{case}{patient identifier}
+#'   \item{truth}{true breast cancer status (1 = diseased, 0 = non-diseased)}
+#'   \item{rating}{ordinal reader ratings of cancer status (1 = typical,
+#'     2 = benign, 3-5 = increasingly identifiable disease)}
+#' }
+#'
+#' @references
+#' 
+#' Soh  BP, Lee WB, Sim L, Wong J, Hillis S, Tapia KA, Brennan P (2021)
+#' Telereporting in breast imaging involving more than 1 country requires
+#' careful consideration. Radiologic Technology, 92(4): 345-353.
+#' 
+"Soh"
+
+
+#' Multi-reader multi-case dataset
+#'
 #' @format A data frame with 1140 rows and 7 variables:
 #' \describe{
 #'   \item{reader}{reader identifier}

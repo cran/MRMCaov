@@ -1,4 +1,4 @@
-## ---- setup, include=FALSE----------------------------------------------------
+## ----setup, include=FALSE-----------------------------------------------------
 options(
   prompt = 'R> ',
   continue = '+ ',
@@ -15,7 +15,7 @@ print_data <- function(x) {
 }
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  install.packages("MRMCaov")
+# install.packages("MRMCaov")
 
 ## ----citation, comment = ""---------------------------------------------------
 ## Text format

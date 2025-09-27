@@ -165,8 +165,9 @@ new_summary_mrmc <- function(
 
   test_levels <- levels(object)$test
 
-  n_formula <- (n_reader - sum(n_readers^2)) / (n_reader * (n_test - 1))
-  denominator <- MS[["R"]] + n_formula * max(cov[2] - cov[3], 0)
+  Delta <- (n_reader - sum(n_readers^2) / n_reader) / (n_test - 1) *
+    max(cov[2] - cov[3], 0)
+  denominator <- MS[["R"]] + Delta
   test_equality <- data.frame(
     `MS[T]` = MS[["T"]],
     `MS[R(T)]` = MS[["R"]],
@@ -175,8 +176,7 @@ new_summary_mrmc <- function(
     Denominator = denominator,
     F = MS[["T"]] / denominator,
     df1 = n_test - 1,
-    df2 = (MS[["R"]] + n_formula * max(cov[2] - cov[3], 0))^2 /
-      (MS[["R"]]^2 / (n_reader - n_test)),
+    df2 = (MS[["R"]] + Delta)^2 / (MS[["R"]]^2 / (n_reader - n_test)),
     check.names = FALSE
   )
   test_equality$`p-value` <- with(test_equality, 1 - pf(F, df1, df2))
@@ -232,7 +232,8 @@ new_summary_mrmc <- function(
   rownames(test_means) <- names(test_means_list)
 
   estimates <- test_means$Estimate
-  denominator <- comps$var - cov[1] + (n[["reader"]] - 1) * (cov[2] - cov[3])
+  denominator <- comps$var - cov[1] + (n[["reader"]] - 1) *
+    max(cov[2] - cov[3], 0)
   combs <- combinations(length(estimates), 2)
   test_diffs <- data.frame(
     Comparison = paste(test_levels[combs[, 1]], "-", test_levels[combs[, 2]]),
@@ -336,8 +337,9 @@ reader_test_diffs <- function(object, conf.level) {
 
   test_levels <- levels(object)$test
 
-  n_formula <- (n_reader - sum(n_readers^2)) / (n_reader * (n_test - 1))
-  denominator <- comps$var - cov[2] + n_formula * max(cov[2] - cov[3], 0)
+  Delta <- (n_reader - sum(n_readers^2) / n_reader) / (n_test - 1) *
+    max(cov[2] - cov[3], 0)
+  denominator <- comps$var - cov[2] + Delta
   test_equality <- data.frame(
     `MS(T)` = MS[["T"]],
     Cov2 = cov[2],
@@ -383,6 +385,7 @@ reader_test_diffs <- function(object, conf.level) {
     vcov_comps = summary(comps),
     test_equality = test_equality,
     test_diffs = test_diffs,
+    test_means = test_means,
     reader_means = reader_means
   )
   structure(res, class = c("summary.mrmc_frrc", class(res)))
@@ -485,7 +488,7 @@ reader_test_diffs <- function(object, conf.level) {
     test_diffs = test_diffs,
     test_means = test_means
   )
-  structure(res, class = c("summary.mrmc_frrc", class(res)))
+  structure(res, class = c("summary.mrmc_rrfc", class(res)))
 }
 
 

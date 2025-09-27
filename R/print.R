@@ -69,7 +69,7 @@ print.roc_curves <- function(x, n_curves = 5, n = 11, ...) {
   for (i in seq_len(n_curves)) {
     if (i != 1) cat(vsep, "\n")
     cat(paste0(
-      names(x$Group), ": ",  as.character(x$Group[i, ]), collapse = "\n"
+      names(x$Group), ": ",  sapply(x$Group[i, ], as.character), collapse = "\n"
     ), "\n")
     print(x$Curve[[i]], n = n, ...)
   }
@@ -124,10 +124,10 @@ print.summary.mrmc <- function(x, ...) {
 
 
 .print.summary.mrmc_frrc <- function(x, ...) {
-  is_one_reader <- is.null(x$reader_test_diffs)
+  n_reader <- nlevels(x$reader_means[[x$vars["reader"]]])
 
   cat(
-    if (is_one_reader) "Single" else "Multi",
+    if (n_reader == 1) "Single" else "Multi",
     "-Reader Multi-Case Analysis of Variance\n",
     "Data: ", x$data_name, "\n",
     "Factor types: Fixed Readers and Random Cases\n",
@@ -137,7 +137,7 @@ print.summary.mrmc <- function(x, ...) {
 
   .print.summary.mrmc(x)
 
-  if (!is_one_reader) {
+  if (!is.null(x$reader_test_diffs)) {
     header(
       "\n\nReader-specific ", 100 * x$conf.level, "% CIs and tests for ",
       x$vars["metric"], " pairwise differences (each analysis based only on",
@@ -147,10 +147,8 @@ print.summary.mrmc <- function(x, ...) {
     print(x$reader_test_diffs)
   }
 
-  if (!is.null(x$reader_means)) {
-    header("\n\nSingle reader ", 100 * x$conf.level, "% CIs:\n\n", sep = "")
-    print(x$reader_means)
-  }
+  header("\n\nSingle reader ", 100 * x$conf.level, "% CIs:\n\n", sep = "")
+  print(x$reader_means)
 
   invisible(x)
 }

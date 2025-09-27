@@ -33,7 +33,7 @@ jackknife <- function() {
         }
         inds <- -inds
         res[inds] <- res[lookup$index[inds]]
-        pb$tick(length(res) - length(inds))
+        if (num_dups <- length(res) - length(inds)) pb$tick(num_dups)
         res
       })
 
